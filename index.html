@@ -6,229 +6,214 @@
 <title>CasoPrácticoAI — Generador de Casos y Actividades</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script>
 <style>
-  :root {
-    --ink:        #1a1f2e;
-    --ink-soft:   #4a5270;
-    --surface:    #f4faf7;
-    --card:       #ffffff;
-    --border:     #d8eee5;
-    --accent:     #0d7a55;
-    --accent-dk:  #085c3f;
-    --accent-lt:  #d1f5e8;
-    --accent-mid: #34a874;
-    --blue:       #2d5be3;
-    --blue-lt:    #dbeafe;
-    --amber:      #d97706;
-    --amber-lt:   #fef3c7;
-    --red:        #dc2626;
-    --red-lt:     #fee2e2;
-    --purple:     #7c3aed;
-    --purple-lt:  #ede9fe;
-    --teal:       #0e7490;
-    --teal-lt:    #cffafe;
-    --radius:     10px;
-    --shadow:     0 2px 12px rgba(26,31,46,.07);
-    --shadow-lg:  0 8px 32px rgba(26,31,46,.13);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+:root{
+  --ink:#1a1f2e;--ink-soft:#4a5270;--surface:#f4faf7;--card:#ffffff;--border:#d8eee5;
+  --accent:#0d7a55;--accent-dk:#085c3f;--accent-lt:#d1f5e8;--accent-mid:#34a874;
+  --blue:#2d5be3;--blue-lt:#dbeafe;--amber:#d97706;--amber-lt:#fef3c7;
+  --red:#dc2626;--red-lt:#fee2e2;--purple:#7c3aed;--purple-lt:#ede9fe;
+  --teal:#0e7490;--teal-lt:#cffafe;--radius:10px;
+  --shadow:0 2px 12px rgba(26,31,46,.07);--shadow-lg:0 8px 32px rgba(26,31,46,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
 
-  /* ── TOP BAR ── */
-  .topbar{background:var(--ink);color:#fff;padding:0 28px;display:flex;align-items:stretch;justify-content:space-between;gap:16px;height:52px}
-  .topbar-brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.3px}
-  .topbar-brand .badge{background:var(--accent);color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;letter-spacing:.5px}
-  .topbar-brand .link-syllabus{font-size:12px;color:rgba(255,255,255,.45);font-weight:400;margin-left:6px;cursor:pointer;text-decoration:underline dotted;transition:.2s}
-  .topbar-brand .link-syllabus:hover{color:#fff}
-  .topbar-right{display:flex;align-items:center;gap:8px}
-  .btn-top{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:6px 13px;font-size:13px;cursor:pointer;transition:.2s;height:34px;display:flex;align-items:center;gap:5px}
-  .btn-top:hover{background:rgba(255,255,255,.2)}
+/* ── TOP BAR ── */
+.topbar{background:var(--ink);color:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;height:50px;flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+.topbar-brand .badge{background:var(--accent);color:#fff;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-top{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 11px;font-size:12px;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-top:hover{background:rgba(255,255,255,.2)}
 
-  /* ── LAYOUT ── */
-  .layout{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 52px)}
-  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+/* ── APP SHELL: sidebar izquierda fija, main scrollable ── */
+.app-shell{display:flex;height:calc(100vh - 50px);overflow:hidden}
 
-  /* ── SIDEBAR ── */
-  .sidebar{background:var(--card);border-right:1px solid var(--border);padding:20px 18px;overflow-y:auto;max-height:calc(100vh - 52px);position:sticky;top:0}
-  .sidebar-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px}
+/* ── SIDEBAR ── */
+.sidebar{
+  width:320px;min-width:320px;max-width:320px;
+  background:var(--card);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:16px 14px}
+.sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);background:var(--card)}
+.sidebar-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
 
-  .form-section{margin-bottom:20px}
-  .form-section-label{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--accent-lt)}
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:24px}
 
-  .field{margin-bottom:10px}
-  .field label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
-  .field input,.field select,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13.5px;color:var(--ink);background:#fff;transition:.2s;font-family:inherit}
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
-  .field textarea{resize:vertical;min-height:62px}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* ── FORM ── */
+.form-section{margin-bottom:18px}
+.form-section-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--accent-lt)}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:7px;font-size:13px;color:var(--ink);background:#fff;transition:.2s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+.field textarea{resize:vertical;min-height:54px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.model-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:var(--purple-lt);color:var(--purple);border-radius:4px;padding:2px 6px;font-weight:600;margin-top:2px}
 
-  /* Tipo selector pills */
-  .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
-  .tipo-pill{padding:8px 6px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s;text-align:center;background:#fff}
-  .tipo-pill:hover{border-color:var(--accent);background:var(--accent-lt)}
-  .tipo-pill.active{border-color:var(--accent);background:var(--accent);color:#fff}
-  .tipo-pill .tp-icon{font-size:18px;display:block;margin-bottom:2px}
-  .tipo-pill .tp-label{font-size:11px;font-weight:700;letter-spacing:.3px;line-height:1.2}
+/* ── TIPO PILLS ── */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:3px}
+.tipo-pill{padding:7px 5px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:.2s;text-align:center;background:#fff}
+.tipo-pill:hover{border-color:var(--accent);background:var(--accent-lt)}
+.tipo-pill.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.tipo-pill .tp-icon{font-size:16px;display:block;margin-bottom:1px}
+.tipo-pill .tp-label{font-size:10px;font-weight:700;letter-spacing:.2px;line-height:1.2}
 
-  .model-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;background:var(--purple-lt);color:var(--purple);border-radius:4px;padding:2px 7px;font-weight:600;margin-top:3px}
+/* ── GEN BUTTON ── */
+.btn-gen{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-gen:hover{background:var(--accent-dk)}
+.btn-gen:disabled{background:#94a3b8;cursor:not-allowed}
 
-  .btn-gen{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
-  .btn-gen:hover{background:var(--accent-dk)}
-  .btn-gen:disabled{background:#94a3b8;cursor:not-allowed}
+/* ── IMPORT BANNER ── */
+.import-banner{background:linear-gradient(135deg,var(--blue-lt),var(--accent-lt));border:1px dashed var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:12px;cursor:pointer;transition:.2s;text-align:center}
+.import-banner:hover{border-style:solid}
+.import-banner .ib-title{font-weight:700;font-size:12px;color:var(--blue);margin-bottom:1px}
+.import-banner .ib-sub{font-size:11px;color:var(--ink-soft)}
+.imported-tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent-lt);color:var(--accent-dk);border-radius:5px;padding:3px 8px;font-size:11px;font-weight:700;margin-bottom:10px}
 
-  /* import banner */
-  .import-banner{background:linear-gradient(135deg,var(--blue-lt),var(--accent-lt));border:1px dashed var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:14px;cursor:pointer;transition:.2s;text-align:center}
-  .import-banner:hover{border-style:solid;border-color:var(--accent)}
-  .import-banner .ib-title{font-weight:700;font-size:13px;color:var(--blue);margin-bottom:2px}
-  .import-banner .ib-sub{font-size:11.5px;color:var(--ink-soft)}
-  .imported-tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent-lt);color:var(--accent-dk);border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700;margin-bottom:10px}
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:20px;display:none}
+.progress-wrap.active{display:block}
+.progress-title{font-weight:700;margin-bottom:12px;font-size:14px}
+.agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.agent-card{border:1px solid var(--border);border-radius:7px;padding:9px 10px;font-size:12px;transition:.3s}
+.agent-card .a-name{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.agent-card .a-status{color:var(--ink-soft);font-size:11px}
+.agent-card.pending{background:#fafafa;color:#aaa}
+.agent-card.running{background:var(--amber-lt);border-color:var(--amber);animation:pulse 1.2s ease-in-out infinite}
+.agent-card.done{background:var(--accent-lt);border-color:var(--accent)}
+.agent-card.error{background:var(--red-lt);border-color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.progress-bar-wrap{background:var(--border);border-radius:99px;height:5px;overflow:hidden}
+.progress-bar{background:var(--accent);height:100%;border-radius:99px;transition:width .4s}
 
-  /* ── MAIN ── */
-  .main{padding:28px;overflow-y:auto}
+/* ── RESULT ── */
+.result-panel{display:none}
+.result-panel.active{display:block}
+.caso-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.caso-title-block .caso-tipo-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.caso-title-block h2{font-size:20px;font-weight:800;color:var(--ink);line-height:1.2}
+.caso-meta-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.caso-meta-chip{background:var(--surface);border:1px solid var(--border);color:var(--ink-soft);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:500}
+.export-btns{display:flex;gap:7px;flex-wrap:wrap}
+.btn-export{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s;white-space:nowrap}
+.btn-word{background:#2b579a;color:#fff}.btn-word:hover{background:#1e3f7a}
+.btn-pdf{background:#c0392b;color:#fff}.btn-pdf:hover{background:#922b21}
+.btn-copy{background:var(--ink-soft);color:#fff}.btn-copy:hover{background:var(--ink)}
 
-  /* ── TABS ── */
-  .tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
-  .tab{padding:10px 20px;font-size:13.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-  .tab:hover:not(.active){color:var(--ink)}
+/* ── CASO BODY ── */
+.caso-body{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.caso-section{padding:18px 24px;border-bottom:1px solid var(--border)}
+.caso-section:last-child{border-bottom:none}
+.caso-section-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.caso-section-icon{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--accent-lt)}
+.caso-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent)}
+.caso-section-content{font-size:13.5px;color:var(--ink);line-height:1.75;white-space:pre-wrap}
 
-  /* ── PROGRESS ── */
-  .progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;display:none}
-  .progress-wrap.active{display:block}
-  .progress-title{font-weight:700;margin-bottom:12px;font-size:15px}
-  .agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-  @media(max-width:700px){.agents-grid{grid-template-columns:1fr 1fr}}
-  .agent-card{border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12.5px;transition:.3s}
-  .agent-card .a-name{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-  .agent-card .a-status{color:var(--ink-soft);font-size:11.5px}
-  .agent-card.pending{background:#fafafa;color:#aaa}
-  .agent-card.running{background:var(--amber-lt);border-color:var(--amber);animation:pulse 1.2s ease-in-out infinite}
-  .agent-card.done{background:var(--accent-lt);border-color:var(--accent)}
-  .agent-card.error{background:var(--red-lt);border-color:var(--red)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-  .progress-bar-wrap{background:var(--border);border-radius:99px;height:6px;overflow:hidden}
-  .progress-bar{background:var(--accent);height:100%;border-radius:99px;transition:width .4s}
+/* Objetivos */
+.objetivos-grid{display:flex;flex-wrap:wrap;gap:7px}
+.objetivo-pill{background:var(--accent-lt);color:var(--accent-dk);border-radius:6px;padding:5px 11px;font-size:12.5px;font-weight:500;display:flex;align-items:flex-start;gap:5px}
+.objetivo-num{font-weight:800;flex-shrink:0}
 
-  /* ── RESULT ── */
-  .result-panel{display:none}
-  .result-panel.active{display:block}
+/* Preguntas */
+.pregunta-item{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:9px}
+.pregunta-item:last-child{margin-bottom:0}
+.pregunta-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;font-size:11px;font-weight:700;margin-right:7px;flex-shrink:0}
+.pregunta-text{font-size:13.5px;color:var(--ink);font-weight:500}
+.pregunta-bloom{display:inline-block;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:700;margin-top:5px;letter-spacing:.3px}
+.bloom-1,.bloom-2{background:#dbeafe;color:#1e40af}
+.bloom-3{background:#d1fae5;color:#065f46}
+.bloom-4{background:#fef3c7;color:#92400e}
+.bloom-5{background:#ede9fe;color:#5b21b6}
+.bloom-6{background:#fee2e2;color:#991b1b}
 
-  /* Caso header */
-  .caso-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:22px}
-  .caso-title-block .caso-tipo-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-  .caso-title-block h2{font-size:22px;font-weight:800;color:var(--ink);line-height:1.2}
-  .caso-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .caso-meta-chip{background:var(--surface);border:1px solid var(--border);color:var(--ink-soft);border-radius:5px;padding:3px 9px;font-size:12px;font-weight:500}
-  .export-btns{display:flex;gap:8px;flex-wrap:wrap}
-  .btn-export{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.2s}
-  .btn-word{background:#2b579a;color:#fff}.btn-word:hover{background:#1e3f7a}
-  .btn-pdf{background:#c0392b;color:#fff}.btn-pdf:hover{background:#922b21}
-  .btn-copy{background:var(--ink-soft);color:#fff}.btn-copy:hover{background:var(--ink)}
-  .btn-variant{background:var(--amber);color:#fff}.btn-variant:hover{background:#b45309}
-  .btn-nuevo{background:var(--accent);color:#fff}.btn-nuevo:hover{background:var(--accent-dk)}
+/* Datos clave */
+.datos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:14px}
+.dato-card{background:var(--teal-lt);border:1px solid var(--teal);border-radius:7px;padding:9px 11px;font-size:12.5px}
+.dato-card .dc-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
 
-  /* Caso body */
-  .caso-body{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+/* Solución */
+.solucion-wrap{background:var(--accent-lt);border:1px solid var(--accent-mid);border-radius:7px;padding:14px 18px}
+.solucion-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-dk);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.solucion-content{font-size:13.5px;color:var(--ink);line-height:1.75;white-space:pre-wrap}
 
-  .caso-section{padding:22px 28px;border-bottom:1px solid var(--border)}
-  .caso-section:last-child{border-bottom:none}
-  .caso-section-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-  .caso-section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-  .caso-section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent)}
-  .caso-section-content{font-size:14px;color:var(--ink);line-height:1.75;white-space:pre-wrap}
+/* Rúbrica */
+.rubrica-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:5px}
+.rubrica-table th{background:var(--accent);color:#fff;padding:7px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.3px}
+.rubrica-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.rubrica-table tr:nth-child(even) td{background:var(--surface)}
+.rubrica-table tr:last-child td{border-bottom:none}
 
-  /* Objetivos pills */
-  .objetivos-grid{display:flex;flex-wrap:wrap;gap:8px}
-  .objetivo-pill{background:var(--accent-lt);color:var(--accent-dk);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;display:flex;align-items:flex-start;gap:6px}
-  .objetivo-num{font-weight:800;flex-shrink:0}
+/* Variantes */
+.variante-card{border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px;background:#fff}
+.variante-card:last-child{margin-bottom:0}
+.variante-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--amber);margin-bottom:3px}
+.variante-title{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.variante-desc{font-size:12.5px;color:var(--ink-soft)}
 
-  /* Preguntas */
-  .pregunta-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px}
-  .pregunta-item:last-child{margin-bottom:0}
-  .pregunta-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--accent);color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0}
-  .pregunta-text{font-size:14px;color:var(--ink);font-weight:500}
-  .pregunta-bloom{display:inline-block;font-size:11px;padding:2px 7px;border-radius:3px;font-weight:700;margin-top:6px;letter-spacing:.3px}
-  .bloom-1,.bloom-2{background:#dbeafe;color:#1e40af}
-  .bloom-3{background:#d1fae5;color:#065f46}
-  .bloom-4{background:#fef3c7;color:#92400e}
-  .bloom-5{background:#ede9fe;color:#5b21b6}
-  .bloom-6{background:#fee2e2;color:#991b1b}
+/* ── PROMPT EDITOR ── */
+.prompt-editor-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;display:none}
+.prompt-editor-wrap.active{display:block}
+.prompt-editor-header{padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.prompt-editor-header h3{font-size:14px;font-weight:700}
+.prompt-tabs{display:flex;gap:0;overflow-x:auto;padding:0 16px;border-bottom:1px solid var(--border);background:#fff}
+.prompt-tab{padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:.2s}
+.prompt-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.prompt-tab:hover:not(.active){color:var(--ink)}
+.prompt-content{padding:16px 20px}
+.prompt-content textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:7px;font-size:12.5px;font-family:'Courier New',monospace;color:var(--ink);line-height:1.55;resize:vertical;min-height:200px;background:#fafafa}
+.prompt-content textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+.prompt-actions{display:flex;gap:8px;margin-top:10px}
+.btn-prompt-reset{padding:7px 14px;background:var(--red-lt);color:var(--red);border:1px solid var(--red);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-prompt-save{padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.prompt-hint{font-size:11px;color:var(--ink-soft);margin-top:6px;line-height:1.5}
 
-  /* Recursos / datos */
-  .recursos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-  .recurso-card{background:var(--teal-lt);border:1px solid var(--teal);border-radius:8px;padding:10px 12px;font-size:13px}
-  .recurso-card .rc-label{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--ink-soft)}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:.4}
+.empty-state h3{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.empty-state p{font-size:13.5px;max-width:440px;margin:0 auto;line-height:1.7}
+.empty-steps{display:flex;justify-content:center;gap:16px;margin-top:24px;flex-wrap:wrap}
+.empty-step{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;width:130px;text-align:center;font-size:12px}
+.empty-step .es-num{width:26px;height:26px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;margin:0 auto 7px}
 
-  /* Solución */
-  .solucion-wrap{background:var(--accent-lt);border:1px solid var(--accent-mid);border-radius:8px;padding:16px 20px}
-  .solucion-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-dk);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-  .solucion-content{font-size:14px;color:var(--ink);line-height:1.75;white-space:pre-wrap}
+/* ── HISTORY PANEL ── */
+.history-panel{position:fixed;top:0;right:0;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:100;transform:translateX(100%);transition:.3s;padding:22px;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.history-panel.open{transform:translateX(0)}
+.history-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.history-panel-header h3{font-size:15px;font-weight:700}
+.btn-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft)}
+.hp-item{border:1px solid var(--border);border-radius:7px;padding:11px 13px;margin-bottom:9px;cursor:pointer;transition:.2s;background:#fff}
+.hp-item:hover{border-color:var(--accent);background:var(--accent-lt)}
+.hp-item-title{font-weight:700;font-size:13px;margin-bottom:2px}
+.hp-item-meta{font-size:11.5px;color:var(--ink-soft)}
 
-  /* Rúbrica */
-  .rubrica-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
-  .rubrica-table th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.3px}
-  .rubrica-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
-  .rubrica-table tr:nth-child(even) td{background:var(--surface)}
-  .rubrica-table tr:last-child td{border-bottom:none}
+/* ── MODALS / OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99;display:none}
+.overlay.show{display:block}
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:none;align-items:center;justify-content:center}
+.modal-wrap.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:26px;width:90%;max-width:440px;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--ink-soft);margin-bottom:16px}
+.modal-btns{display:flex;gap:9px;justify-content:flex-end}
+.btn-modal-cancel{padding:7px 16px;border:1px solid var(--border);background:#fff;border-radius:6px;font-size:13px;cursor:pointer}
+.btn-modal-ok{padding:7px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer}
 
-  /* Variantes */
-  .variante-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:#fff;cursor:pointer;transition:.2s}
-  .variante-card:hover{border-color:var(--accent);background:var(--accent-lt)}
-  .variante-card:last-child{margin-bottom:0}
-  .variante-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--amber);margin-bottom:4px}
-  .variante-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
-  .variante-desc{font-size:13px;color:var(--ink-soft)}
+.api-warning{background:var(--red-lt);border:1px solid var(--red);border-radius:7px;padding:10px 14px;font-size:12.5px;color:var(--red);margin-bottom:12px;display:none}
+.api-warning.show{display:block}
 
-  /* History tab */
-  .history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-  .history-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:.2s}
-  .history-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
-  .hc-tipo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-  .hc-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;line-height:1.3}
-  .hc-meta{font-size:12px;color:var(--ink-soft)}
-  .history-empty{text-align:center;padding:60px 20px;color:var(--ink-soft)}
-  .history-empty .he-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;padding:11px 18px;border-radius:7px;font-size:13px;font-weight:600;z-index:200;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
 
-  /* Empty state */
-  .empty-state{text-align:center;padding:80px 20px;color:var(--ink-soft)}
-  .empty-icon{font-size:56px;margin-bottom:16px;opacity:.45}
-  .empty-state h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
-  .empty-state p{font-size:14px;max-width:440px;margin:0 auto;line-height:1.7}
-  .empty-steps{display:flex;justify-content:center;gap:20px;margin-top:28px;flex-wrap:wrap}
-  .empty-step{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;width:140px;text-align:center;font-size:12.5px}
-  .empty-step .es-num{width:28px;height:28px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin:0 auto 8px}
-
-  /* HISTORY PANEL (slide-over) */
-  .history-panel{position:fixed;top:0;right:0;width:400px;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:100;transform:translateX(100%);transition:.3s;padding:24px;overflow-y:auto;box-shadow:var(--shadow-lg)}
-  .history-panel.open{transform:translateX(0)}
-  .history-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-  .history-panel-header h3{font-size:16px;font-weight:700}
-  .btn-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft)}
-  .hp-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:.2s;background:#fff}
-  .hp-item:hover{border-color:var(--accent);background:var(--accent-lt)}
-  .hp-item-title{font-weight:700;font-size:13.5px;margin-bottom:3px}
-  .hp-item-meta{font-size:12px;color:var(--ink-soft)}
-
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99;display:none}
-  .overlay.show{display:block}
-
-  /* IMPORT MODAL */
-  .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:none;align-items:center;justify-content:center}
-  .modal-wrap.open{display:flex}
-  .modal{background:#fff;border-radius:12px;padding:28px;width:90%;max-width:460px;box-shadow:var(--shadow-lg)}
-  .modal h3{font-size:17px;font-weight:800;margin-bottom:10px}
-  .modal p{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px}
-  .modal-btns{display:flex;gap:10px;justify-content:flex-end}
-  .btn-modal-cancel{padding:8px 18px;border:1px solid var(--border);background:#fff;border-radius:7px;font-size:13px;cursor:pointer}
-  .btn-modal-ok{padding:8px 18px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer}
-
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:8px;font-size:13.5px;font-weight:600;z-index:200;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
-  .toast.show{opacity:1;transform:translateY(0)}
-
-  .api-warning{background:var(--red-lt);border:1px solid var(--red);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
-  .api-warning.show{display:block}
-
-  .divider-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-soft);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
-  .divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border)}
+@media print{
+  .topbar,.sidebar,.topbar-right,.export-btns,.caso-header .btn-export,.history-panel,.overlay,.toast,.modal-wrap,.prompt-editor-wrap{display:none!important}
+  .app-shell{display:block;height:auto}
+  .main{padding:0}
+  .caso-body{box-shadow:none;border:none}
+  .rubrica-table{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -237,206 +222,188 @@
 <div class="topbar">
   <div class="topbar-brand">
     🧩 CasoPrácticoAI <span class="badge">BETA</span>
-    <span class="link-syllabus" onclick="showToast('Abre SyllabusAI y exporta el JSON de tu guía docente')">← integra SyllabusAI</span>
   </div>
   <div class="topbar-right">
-    <button class="btn-top" onclick="openImportModal()">📥 Importar SyllabusAI</button>
+    <button class="btn-top" onclick="openImportModal()">📥 SyllabusAI</button>
+    <button class="btn-top" onclick="togglePromptEditor()">✏️ Prompts</button>
     <button class="btn-top" onclick="toggleHistory()">🗂️ Historial</button>
   </div>
 </div>
 
-<!-- LAYOUT -->
-<div class="layout">
+<!-- APP SHELL -->
+<div class="app-shell">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-title">Nuevo Caso Práctico</div>
+    <div class="sidebar-scroll">
+      <div class="sidebar-title">Nuevo Caso Práctico</div>
 
-    <div class="api-warning" id="apiWarning">⚠️ Introduce tu API Key de OpenAI.</div>
+      <div class="api-warning" id="apiWarning">⚠️ Introduce tu API Key de OpenAI.</div>
 
-    <!-- SYLLABUS IMPORT TAG -->
-    <div id="importedTag" style="display:none">
-      <div class="imported-tag">🔗 Importado de SyllabusAI: <span id="importedName"></span></div>
-    </div>
-
-    <!-- DROP ZONE -->
-    <div class="import-banner" id="importDropZone" onclick="openImportModal()" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
-      <div class="ib-title">📥 Importar guía desde SyllabusAI</div>
-      <div class="ib-sub">Haz clic o arrastra el JSON exportado</div>
-    </div>
-
-    <!-- CONFIG -->
-    <div class="form-section">
-      <div class="form-section-label">🔑 Configuración</div>
-      <div class="field">
-        <label>API Key OpenAI</label>
-        <input type="password" id="apiKey" placeholder="sk-..." oninput="saveApiKey()">
+      <!-- SYLLABUS IMPORT -->
+      <div id="importedTag" style="display:none">
+        <div class="imported-tag">🔗 <span id="importedName"></span></div>
       </div>
-      <div class="field">
-        <label>Modelo</label>
-        <select id="modelSel" onchange="updateModelBadge()">
-          <option value="gpt-4o-mini">gpt-4o-mini (Recomendado)</option>
-          <option value="gpt-4o">gpt-4o</option>
-          <option value="gpt-4-turbo">gpt-4-turbo</option>
-          <option value="o1-mini">o1-mini</option>
-        </select>
-        <div class="model-badge" id="modelBadge">⚡ gpt-4o-mini · Rápido y económico</div>
+      <div class="import-banner" id="importDropZone" onclick="openImportModal()" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <div class="ib-title">📥 Importar guía SyllabusAI</div>
+        <div class="ib-sub">Clic o arrastra el JSON exportado</div>
       </div>
-    </div>
 
-    <!-- TIPO DE ACTIVIDAD -->
-    <div class="form-section">
-      <div class="form-section-label">📂 Tipo de Actividad</div>
-      <div class="tipo-grid" id="tipoGrid">
-        <div class="tipo-pill active" data-tipo="caso_narrativo" onclick="setTipo(this)">
-          <span class="tp-icon">📖</span><span class="tp-label">Caso Narrativo</span>
-        </div>
-        <div class="tipo-pill" data-tipo="problema_cuantitativo" onclick="setTipo(this)">
-          <span class="tp-icon">🔢</span><span class="tp-label">Problema Cuantitativo</span>
-        </div>
-        <div class="tipo-pill" data-tipo="supuesto_practico" onclick="setTipo(this)">
-          <span class="tp-icon">📝</span><span class="tp-label">Supuesto Práctico</span>
-        </div>
-        <div class="tipo-pill" data-tipo="caso_harvard" onclick="setTipo(this)">
-          <span class="tp-icon">🎓</span><span class="tp-label">Caso Harvard</span>
-        </div>
-        <div class="tipo-pill" data-tipo="roleplay" onclick="setTipo(this)">
-          <span class="tp-icon">🎭</span><span class="tp-label">Role-Play</span>
-        </div>
-        <div class="tipo-pill" data-tipo="proyecto_corto" onclick="setTipo(this)">
-          <span class="tp-icon">🗂️</span><span class="tp-label">Proyecto Corto</span>
-        </div>
-        <div class="tipo-pill" data-tipo="analisis_critico" onclick="setTipo(this)">
-          <span class="tp-icon">🔍</span><span class="tp-label">Análisis Crítico</span>
-        </div>
-        <div class="tipo-pill" data-tipo="debate_seminario" onclick="setTipo(this)">
-          <span class="tp-icon">💬</span><span class="tp-label">Debate / Seminario</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TEMA -->
-    <div class="form-section">
-      <div class="form-section-label">📚 Contenido</div>
-      <div class="field">
-        <label>Asignatura *</label>
-        <input type="text" id="fAsignatura" placeholder="Ej: Estadística Aplicada">
-      </div>
-      <div class="field">
-        <label>Tema específico del caso *</label>
-        <input type="text" id="fTema" placeholder="Ej: Regresión lineal en datos agrícolas">
-      </div>
-      <div class="field">
-        <label>Bloque / Tema del programa (opcional)</label>
-        <select id="fBloqueSelect" style="display:none">
-          <option value="">— selecciona un bloque —</option>
-        </select>
-        <input type="text" id="fBloque" placeholder="Ej: Bloque 3 — Inferencia estadística">
-      </div>
-    </div>
-
-    <!-- PARÁMETROS PEDAGÓGICOS -->
-    <div class="form-section">
-      <div class="form-section-label">🎯 Parámetros Pedagógicos</div>
-      <div class="field-row">
+      <!-- CONFIG -->
+      <div class="form-section">
+        <div class="form-section-label">🔑 Configuración</div>
         <div class="field">
-          <label>Nivel educativo</label>
-          <select id="fNivel">
-            <option>Grado 1º-2º</option>
-            <option selected>Grado 3º-4º</option>
-            <option>Máster</option>
-            <option>Doctorado</option>
+          <label>API Key OpenAI</label>
+          <input type="password" id="apiKey" placeholder="sk-..." oninput="saveApiKey()">
+        </div>
+        <div class="field">
+          <label>Modelo</label>
+          <select id="modelSel" onchange="updateModelBadge()">
+            <option value="gpt-4o-mini">gpt-4o-mini (Recomendado)</option>
+            <option value="gpt-4o">gpt-4o</option>
+            <option value="gpt-4-turbo">gpt-4-turbo</option>
+            <option value="o1-mini">o1-mini</option>
           </select>
-        </div>
-        <div class="field">
-          <label>Dificultad</label>
-          <select id="fDificultad">
-            <option>Básico</option>
-            <option selected>Intermedio</option>
-            <option>Avanzado</option>
-          </select>
+          <div class="model-badge" id="modelBadge">⚡ gpt-4o-mini · Rápido y económico</div>
         </div>
       </div>
-      <div class="field-row">
+
+      <!-- TIPO -->
+      <div class="form-section">
+        <div class="form-section-label">📂 Tipo de Actividad</div>
+        <div class="tipo-grid" id="tipoGrid">
+          <div class="tipo-pill active" data-tipo="caso_narrativo" onclick="setTipo(this)"><span class="tp-icon">📖</span><span class="tp-label">Caso Narrativo</span></div>
+          <div class="tipo-pill" data-tipo="problema_cuantitativo" onclick="setTipo(this)"><span class="tp-icon">🔢</span><span class="tp-label">Problema Cuantit.</span></div>
+          <div class="tipo-pill" data-tipo="supuesto_practico" onclick="setTipo(this)"><span class="tp-icon">📝</span><span class="tp-label">Supuesto Práctico</span></div>
+          <div class="tipo-pill" data-tipo="caso_harvard" onclick="setTipo(this)"><span class="tp-icon">🎓</span><span class="tp-label">Caso Harvard</span></div>
+          <div class="tipo-pill" data-tipo="roleplay" onclick="setTipo(this)"><span class="tp-icon">🎭</span><span class="tp-label">Role-Play</span></div>
+          <div class="tipo-pill" data-tipo="proyecto_corto" onclick="setTipo(this)"><span class="tp-icon">🗂️</span><span class="tp-label">Proyecto Corto</span></div>
+          <div class="tipo-pill" data-tipo="analisis_critico" onclick="setTipo(this)"><span class="tp-icon">🔍</span><span class="tp-label">Análisis Crítico</span></div>
+          <div class="tipo-pill" data-tipo="debate_seminario" onclick="setTipo(this)"><span class="tp-icon">💬</span><span class="tp-label">Debate/Seminario</span></div>
+        </div>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="form-section">
+        <div class="form-section-label">📚 Contenido</div>
         <div class="field">
-          <label>Nº de preguntas</label>
-          <input type="number" id="fPreguntas" value="4" min="1" max="10">
+          <label>Asignatura *</label>
+          <input type="text" id="fAsignatura" placeholder="Ej: Estadística Aplicada">
         </div>
         <div class="field">
-          <label>Duración estimada</label>
-          <select id="fDuracion">
-            <option>30 min (individual)</option>
-            <option selected>1 hora (individual)</option>
-            <option>2 horas (en clase)</option>
-            <option>Proyecto semanal</option>
-            <option>Proyecto quincenal</option>
+          <label>Tema específico del caso *</label>
+          <input type="text" id="fTema" placeholder="Ej: Regresión lineal en datos agrícolas">
+        </div>
+        <div class="field">
+          <label>Bloque / Unidad temática</label>
+          <select id="fBloqueSelect" style="display:none"></select>
+          <input type="text" id="fBloque" placeholder="Ej: Bloque 3 — Inferencia estadística">
+        </div>
+      </div>
+
+      <!-- PARÁMETROS -->
+      <div class="form-section">
+        <div class="form-section-label">🎯 Parámetros Pedagógicos</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Nivel</label>
+            <select id="fNivel">
+              <option>Grado 1º-2º</option>
+              <option selected>Grado 3º-4º</option>
+              <option>Máster</option>
+              <option>Doctorado</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Dificultad</label>
+            <select id="fDificultad">
+              <option>Básico</option>
+              <option selected>Intermedio</option>
+              <option>Avanzado</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Nº preguntas</label>
+            <input type="number" id="fPreguntas" value="4" min="1" max="10">
+          </div>
+          <div class="field">
+            <label>Duración</label>
+            <select id="fDuracion">
+              <option>30 min</option>
+              <option selected>1 hora</option>
+              <option>2 horas</option>
+              <option>Proyecto semanal</option>
+              <option>Proyecto quincenal</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Modalidad de trabajo</label>
+          <select id="fModalidad">
+            <option selected>Individual</option>
+            <option>Parejas</option>
+            <option>Grupos pequeños (3-4)</option>
+            <option>Grupos grandes (5+)</option>
           </select>
         </div>
       </div>
-      <div class="field">
-        <label>Modalidad de trabajo</label>
-        <select id="fModalidad">
-          <option selected>Individual</option>
-          <option>Parejas</option>
-          <option>Grupos pequeños (3-4)</option>
-          <option>Grupos grandes (5+)</option>
-        </select>
-      </div>
-    </div>
 
-    <!-- CONTEXTO Y OPCIONES -->
-    <div class="form-section">
-      <div class="form-section-label">🌍 Contexto y Opciones</div>
-      <div class="field">
-        <label>Contexto geográfico del caso</label>
-        <select id="fContexto">
-          <option selected>España</option>
-          <option>México</option>
-          <option>Colombia</option>
-          <option>Argentina</option>
-          <option>Chile</option>
-          <option>Perú</option>
-          <option>Brasil (portugués)</option>
-          <option>Iberoamérica genérico</option>
-          <option>Internacional / neutro</option>
-        </select>
+      <!-- CONTEXTO -->
+      <div class="form-section">
+        <div class="form-section-label">🌍 Contexto y Opciones</div>
+        <div class="field">
+          <label>Contexto geográfico</label>
+          <select id="fContexto">
+            <option selected>España</option>
+            <option>México</option>
+            <option>Colombia</option>
+            <option>Argentina</option>
+            <option>Chile</option>
+            <option>Perú</option>
+            <option>Brasil (portugués)</option>
+            <option>Iberoamérica genérico</option>
+            <option>Internacional / neutro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Solución / Corrección</label>
+          <select id="fSolucion">
+            <option value="completa" selected>Solución completa</option>
+            <option value="criterios">Solo criterios</option>
+            <option value="no">Sin solución</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Competencias a trabajar</label>
+          <select id="fCompSelect" style="display:none"></select>
+          <textarea id="fCompetencias" placeholder="Ej: CE1, CE3 — o vacío para que la IA elija" style="min-height:44px"></textarea>
+        </div>
+        <div class="field">
+          <label>Datos o contexto extra</label>
+          <textarea id="fContextoExtra" placeholder="Datos específicos, empresa ficticia, normativa…" style="min-height:44px"></textarea>
+        </div>
+        <div class="field">
+          <label>Idioma de salida</label>
+          <select id="fIdioma">
+            <option selected>Español</option>
+            <option>Castellano neutro (Iberoamérica)</option>
+            <option>Catalán</option>
+            <option>Valenciano</option>
+            <option>Inglés</option>
+            <option>Portugués (Brasil)</option>
+          </select>
+        </div>
       </div>
-      <div class="field">
-        <label>Incluir solución / corrección</label>
-        <select id="fSolucion">
-          <option value="completa" selected>Solución completa</option>
-          <option value="criterios">Solo criterios de evaluación</option>
-          <option value="no">Sin solución (solo enunciado)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Competencias a trabajar (opcional)</label>
-        <select id="fCompSelect" style="display:none">
-          <option value="">— selecciona de SyllabusAI —</option>
-        </select>
-        <textarea id="fCompetencias" placeholder="Ej: CE1, CE3 — o déjalo vacío para que la IA elija" style="min-height:50px"></textarea>
-      </div>
-      <div class="field">
-        <label>Contexto o datos extra (opcional)</label>
-        <textarea id="fContextoExtra" placeholder="Datos específicos, empresa ficticia, normativa, etc." style="min-height:50px"></textarea>
-      </div>
-      <div class="field">
-        <label>Idioma de salida</label>
-        <select id="fIdioma">
-          <option selected>Español</option>
-          <option>Castellano neutro (Iberoamérica)</option>
-          <option>Catalán</option>
-          <option>Valenciano</option>
-          <option>Inglés</option>
-          <option>Portugués (Brasil)</option>
-        </select>
-      </div>
-    </div>
+    </div><!-- /sidebar-scroll -->
 
-    <button class="btn-gen" id="btnGen" onclick="generateCaso()">
-      <span id="btnGenIcon">🧩</span>
-      <span id="btnGenText">Generar Caso Práctico</span>
-    </button>
+    <div class="sidebar-footer">
+      <button class="btn-gen" id="btnGen" onclick="generateCaso()">
+        <span id="btnGenIcon">🧩</span>
+        <span id="btnGenText">Generar Caso Práctico</span>
+      </button>
+    </div>
   </aside>
 
   <!-- MAIN -->
@@ -446,11 +413,11 @@
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">🧩</div>
       <h3>Genera casos prácticos alineados con tu docencia</h3>
-      <p>Configura el tipo de actividad, el tema y los parámetros pedagógicos. Si tienes SyllabusAI, importa la guía docente para que los casos queden automáticamente alineados con tus competencias y temario.</p>
+      <p>Configura el tipo de actividad y el tema. Si tienes SyllabusAI, importa la guía para alinear automáticamente los casos con tus competencias y temario.</p>
       <div class="empty-steps">
-        <div class="empty-step"><div class="es-num">1</div>Importa tu guía de SyllabusAI (opcional)</div>
-        <div class="empty-step"><div class="es-num">2</div>Elige tipo de actividad y tema</div>
-        <div class="empty-step"><div class="es-num">3</div>Genera, exporta y reutiliza</div>
+        <div class="empty-step"><div class="es-num">1</div>Importa guía SyllabusAI (opcional)</div>
+        <div class="empty-step"><div class="es-num">2</div>Elige tipo y tema</div>
+        <div class="empty-step"><div class="es-num">3</div>Genera y exporta</div>
       </div>
     </div>
 
@@ -461,10 +428,27 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
     </div>
 
+    <!-- PROMPT EDITOR -->
+    <div class="prompt-editor-wrap" id="promptEditorWrap">
+      <div class="prompt-editor-header">
+        <h3>✏️ Editor de Prompts</h3>
+        <button class="btn-top" style="background:var(--red-lt);color:var(--red);border-color:var(--red)" onclick="togglePromptEditor()">✕ Cerrar</button>
+      </div>
+      <div class="prompt-tabs" id="promptTabs"></div>
+      <div class="prompt-content">
+        <textarea id="promptTextarea" rows="12" placeholder="Selecciona un agente arriba…"></textarea>
+        <div class="prompt-hint">
+          Variables disponibles: <code>{asignatura}</code> <code>{tema}</code> <code>{tipo}</code> <code>{nivel}</code> <code>{dificultad}</code> <code>{preguntas}</code> <code>{idioma}</code> <code>{contexto}</code> — se sustituyen automáticamente al generar.
+        </div>
+        <div class="prompt-actions">
+          <button class="btn-prompt-reset" onclick="resetCurrentPrompt()">↺ Restaurar original</button>
+          <button class="btn-prompt-save" onclick="saveCurrentPrompt()">💾 Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+
     <!-- RESULT -->
     <div class="result-panel" id="resultPanel">
-
-      <!-- caso header -->
       <div class="caso-header">
         <div class="caso-title-block">
           <div class="caso-tipo-badge" id="casoBadge"></div>
@@ -475,17 +459,13 @@
           <button class="btn-export btn-word" onclick="exportWord()">📄 Word</button>
           <button class="btn-export btn-pdf" onclick="window.print()">🖨️ PDF</button>
           <button class="btn-export btn-copy" onclick="copyCaso()">📋 Copiar</button>
-          <button class="btn-export btn-variant" onclick="generateVariante()">🔀 Variante</button>
         </div>
       </div>
-
-      <!-- caso body -->
       <div class="caso-body" id="casoBody"></div>
-
     </div>
 
   </main>
-</div>
+</div><!-- /app-shell -->
 
 <!-- HISTORY PANEL -->
 <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
@@ -502,14 +482,13 @@
   <div class="modal">
     <h3>📥 Importar guía de SyllabusAI</h3>
     <p>Selecciona el archivo JSON exportado desde SyllabusAI. Los campos de asignatura, competencias y temario se rellenarán automáticamente.</p>
-    <input type="file" id="importFileInput" accept=".json" style="width:100%;margin-bottom:18px;font-size:13px" onchange="handleImportFile(event)">
+    <input type="file" id="importFileInput" accept=".json" style="width:100%;margin-bottom:16px;font-size:13px" onchange="handleImportFile(event)">
     <div class="modal-btns">
       <button class="btn-modal-cancel" onclick="closeImportModal()">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -517,23 +496,23 @@
 // CONSTANTS
 // ─────────────────────────────────────────────
 const TIPO_META = {
-  caso_narrativo:       { label:'Caso Narrativo',         icon:'📖', color:'#2d5be3', bg:'#dbeafe' },
-  problema_cuantitativo:{ label:'Problema Cuantitativo',  icon:'🔢', color:'#065f46', bg:'#d1fae5' },
-  supuesto_practico:    { label:'Supuesto Práctico',      icon:'📝', color:'#92400e', bg:'#fef3c7' },
-  caso_harvard:         { label:'Caso Harvard',           icon:'🎓', color:'#5b21b6', bg:'#ede9fe' },
-  roleplay:             { label:'Role-Play',              icon:'🎭', color:'#9d174d', bg:'#fce7f3' },
-  proyecto_corto:       { label:'Proyecto Corto',         icon:'🗂️', color:'#0e7490', bg:'#cffafe' },
-  analisis_critico:     { label:'Análisis Crítico',       icon:'🔍', color:'#7c3aed', bg:'#ede9fe' },
-  debate_seminario:     { label:'Debate / Seminario',     icon:'💬', color:'#b45309', bg:'#fef9c3' },
+  caso_narrativo:        {label:'Caso Narrativo',          icon:'📖', color:'#2d5be3', bg:'#dbeafe'},
+  problema_cuantitativo: {label:'Problema Cuantitativo',   icon:'🔢', color:'#065f46', bg:'#d1fae5'},
+  supuesto_practico:     {label:'Supuesto Práctico',       icon:'📝', color:'#92400e', bg:'#fef3c7'},
+  caso_harvard:          {label:'Caso Harvard',            icon:'🎓', color:'#5b21b6', bg:'#ede9fe'},
+  roleplay:              {label:'Role-Play',               icon:'🎭', color:'#9d174d', bg:'#fce7f3'},
+  proyecto_corto:        {label:'Proyecto Corto',          icon:'🗂️', color:'#0e7490', bg:'#cffafe'},
+  analisis_critico:      {label:'Análisis Crítico',        icon:'🔍', color:'#7c3aed', bg:'#ede9fe'},
+  debate_seminario:      {label:'Debate / Seminario',      icon:'💬', color:'#b45309', bg:'#fef9c3'},
 };
 
-const AGENTS = [
-  { id:'ped',   name:'Diseñador Pedagógico', desc:'Objetivos y competencias' },
-  { id:'ctx',   name:'Creador de Contexto',  desc:'Narrativa y datos del caso' },
-  { id:'preg',  name:'Formulador',           desc:'Preguntas por niveles Bloom' },
-  { id:'sol',   name:'Solucionador',         desc:'Respuesta modelo y criterios' },
-  { id:'rub',   name:'Evaluador',            desc:'Rúbrica de corrección' },
-  { id:'var',   name:'Variantes',            desc:'Versiones alternativas' },
+const AGENT_DEFS = [
+  {id:'ped',  name:'Diseñador Pedagógico', desc:'Objetivos y competencias'},
+  {id:'ctx',  name:'Creador de Contexto',  desc:'Narrativa y datos del caso'},
+  {id:'preg', name:'Formulador',           desc:'Preguntas por niveles Bloom'},
+  {id:'sol',  name:'Solucionador',         desc:'Respuesta modelo y criterios'},
+  {id:'rub',  name:'Evaluador',            desc:'Rúbrica de corrección'},
+  {id:'var',  name:'Variantes',            desc:'Versiones alternativas'},
 ];
 
 const MODEL_INFO = {
@@ -543,6 +522,141 @@ const MODEL_INFO = {
   'o1-mini':'🧠 o1-mini · Razonamiento avanzado',
 };
 
+// ─────────────────────────────────────────────
+// DEFAULT PROMPTS (editables por el usuario)
+// ─────────────────────────────────────────────
+const DEFAULT_PROMPTS = {
+  ped: `Eres un experto en diseño pedagógico universitario para actividades de tipo {tipo}.
+Devuelve JSON:
+{
+  "objetivos_aprendizaje": ["objetivo 1","objetivo 2","objetivo 3"],
+  "competencias_activadas": ["CE1: ...","CE2: ..."],
+  "nivel_bloom_principal": "Aplicación",
+  "justificacion_pedagogica": "párrafo breve",
+  "indicaciones_docente": "recomendaciones para el profesor"
+}
+Asignatura: {asignatura} | Tema: {tema} | Nivel: {nivel} | Dificultad: {dificultad}
+Duración: {duracion} | Modalidad: {modalidad} | Competencias solicitadas: {competencias}
+{syllabusCtx}
+Idioma: {idioma}
+Responde SOLO con JSON.`,
+
+  ctx: `Eres un experto en redacción de material didáctico universitario. Tipo: {tipo}.
+{tipoInstruccion}
+Devuelve JSON:
+{
+  "titulo": "Título del caso (máx 10 palabras)",
+  "contexto_narrativo": "El texto completo del caso/enunciado (300-500 palabras, rico en detalles realistas)",
+  "datos_clave": [{"etiqueta":"Dato","valor":"..."}],
+  "recursos_adicionales": ["recurso 1","recurso 2"],
+  "pregunta_central": "El reto principal del caso (1 frase)"
+}
+Asignatura: {asignatura} | Tema: {tema} | Bloque: {bloque}
+Contexto geográfico: {contexto} | Datos extra: {contextoExtra}
+Nivel: {nivel} | Dificultad: {dificultad}
+Idioma: {idioma}
+Responde SOLO con JSON.`,
+
+  preg: `Eres un experto en evaluación universitaria con taxonomía de Bloom.
+Genera exactamente {preguntas} preguntas para el caso "{titulo}".
+Devuelve JSON:
+{
+  "preguntas": [
+    {
+      "numero": 1,
+      "texto": "Enunciado completo...",
+      "nivel_bloom": "Comprensión",
+      "bloom_nivel_num": 2,
+      "peso_sugerido": 25,
+      "indicacion": "Orientación sobre la respuesta esperada"
+    }
+  ]
+}
+Contexto del caso: {contextoNarrativo}
+Tipo: {tipo} | Nivel: {nivel} | Dificultad: {dificultad}
+Distribuye los niveles Bloom de forma progresiva. Los pesos deben sumar 100.
+Idioma: {idioma}
+Responde SOLO con JSON.`,
+
+  sol: `Eres un docente universitario experto. Desarrolla la solución para el caso "{titulo}".
+Tipo de solución: {tipoSolucion}
+Devuelve JSON:
+{
+  "tipo_solucion": "{tipoSolucion}",
+  "contenido": "Desarrollo completo, con pasos de cálculo si es cuantitativo (600-900 palabras)",
+  "puntos_clave": ["punto 1","punto 2","punto 3"],
+  "errores_comunes": ["error frecuente 1","error frecuente 2"],
+  "criterios": [
+    {"pregunta": 1, "criterio": "Se espera que el estudiante...", "indicadores_excelente": "...", "indicadores_insuficiente": "..."}
+  ]
+}
+Preguntas: {preguntas}
+Contexto del caso: {contextoNarrativo}
+Nivel: {nivel} | Asignatura: {asignatura}
+Idioma: {idioma}
+Responde SOLO con JSON.`,
+
+  rub: `Eres un experto en evaluación por rúbricas en educación superior.
+Genera una rúbrica con 4-5 criterios para el caso tipo {tipo}.
+Devuelve JSON:
+{
+  "criterios": [
+    {
+      "criterio": "Comprensión del problema",
+      "peso": 20,
+      "excelente": "Descripción nivel 4 (9-10)",
+      "notable": "Descripción nivel 3 (7-8)",
+      "aprobado": "Descripción nivel 2 (5-6)",
+      "insuficiente": "Descripción nivel 1 (0-4)"
+    }
+  ],
+  "nota_global": "Criterio para nota final",
+  "comentarios_uso": "Cómo usar esta rúbrica en clase"
+}
+Los pesos deben sumar 100.
+Objetivos: {objetivos}
+Preguntas: {preguntasTexto}
+Nivel: {nivel}
+Idioma: {idioma}
+Responde SOLO con JSON.`,
+
+  var: `Eres un experto en diseño curricular universitario.
+Genera 3 variantes del caso "{titulo}" (tipo {tipo}).
+Devuelve JSON:
+{
+  "variantes": [
+    {
+      "label": "Versión más sencilla",
+      "titulo": "...",
+      "descripcion": "Cómo modificar para reducir dificultad (2-3 frases)",
+      "cambios": "Qué datos, preguntas o contexto cambiarías"
+    },
+    {
+      "label": "Versión avanzada",
+      "titulo": "...",
+      "descripcion": "Cómo hacer el caso más desafiante",
+      "cambios": "Qué añadirías o complicarías"
+    },
+    {
+      "label": "Versión interdisciplinar",
+      "titulo": "...",
+      "descripcion": "Cómo conectar con otra disciplina",
+      "cambios": "Qué elementos de otra área incorporarías"
+    }
+  ]
+}
+Asignatura: {asignatura} | Nivel original: {nivel} | Dificultad: {dificultad}
+Idioma: {idioma}
+Responde SOLO con JSON.`
+};
+
+// User-edited prompts (persisted in localStorage)
+let userPrompts = {};
+let currentPromptAgent = 'ped';
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
 let currentTipo = 'caso_narrativo';
 let currentCasoData = null;
 let syllabusImport = null;
@@ -556,117 +670,144 @@ window.addEventListener('DOMContentLoaded', () => {
   const k = localStorage.getItem('casosai_key') || localStorage.getItem('syllabusai_key');
   if (k) document.getElementById('apiKey').value = k;
   updateModelBadge();
+  loadUserPrompts();
+  buildPromptTabs();
 });
 
 function saveApiKey(){ localStorage.setItem('casosai_key', document.getElementById('apiKey').value); }
 function updateModelBadge(){ document.getElementById('modelBadge').textContent = MODEL_INFO[document.getElementById('modelSel').value] || ''; }
-function setTipo(el){ currentTipo = el.dataset.tipo; document.querySelectorAll('.tipo-pill').forEach(p=>p.classList.toggle('active', p===el)); }
+function setTipo(el){ currentTipo = el.dataset.tipo; document.querySelectorAll('.tipo-pill').forEach(p=>p.classList.toggle('active',p===el)); }
+
+// ─────────────────────────────────────────────
+// PROMPT EDITOR
+// ─────────────────────────────────────────────
+function loadUserPrompts(){
+  try { userPrompts = JSON.parse(localStorage.getItem('casosai_prompts') || '{}'); } catch{ userPrompts = {}; }
+}
+function saveUserPrompts(){ localStorage.setItem('casosai_prompts', JSON.stringify(userPrompts)); }
+
+function getPrompt(agentId){ return userPrompts[agentId] || DEFAULT_PROMPTS[agentId] || ''; }
+
+function buildPromptTabs(){
+  const container = document.getElementById('promptTabs');
+  container.innerHTML = AGENT_DEFS.map(a =>
+    `<div class="prompt-tab ${a.id===currentPromptAgent?'active':''}" data-agent="${a.id}" onclick="selectPromptTab('${a.id}')">${a.name}</div>`
+  ).join('');
+  showPromptForAgent(currentPromptAgent);
+}
+
+function selectPromptTab(agentId){
+  currentPromptAgent = agentId;
+  document.querySelectorAll('.prompt-tab').forEach(t => t.classList.toggle('active', t.dataset.agent === agentId));
+  showPromptForAgent(agentId);
+}
+
+function showPromptForAgent(agentId){
+  const ta = document.getElementById('promptTextarea');
+  ta.value = getPrompt(agentId);
+  // Highlight if customized
+  ta.style.background = userPrompts[agentId] ? '#fffbeb' : '#fafafa';
+}
+
+function saveCurrentPrompt(){
+  const val = document.getElementById('promptTextarea').value.trim();
+  if (!val){ showToast('⚠️ El prompt no puede estar vacío'); return; }
+  userPrompts[currentPromptAgent] = val;
+  saveUserPrompts();
+  document.getElementById('promptTextarea').style.background = '#fffbeb';
+  showToast('✅ Prompt guardado');
+}
+
+function resetCurrentPrompt(){
+  delete userPrompts[currentPromptAgent];
+  saveUserPrompts();
+  showPromptForAgent(currentPromptAgent);
+  showToast('↺ Prompt restaurado al original');
+}
+
+function togglePromptEditor(){
+  const wrap = document.getElementById('promptEditorWrap');
+  const isOpen = wrap.classList.contains('active');
+  wrap.classList.toggle('active');
+  if (!isOpen){ buildPromptTabs(); wrap.scrollIntoView({behavior:'smooth',block:'start'}); }
+}
 
 // ─────────────────────────────────────────────
 // INDEXEDDB
 // ─────────────────────────────────────────────
 function initDB(){
   const req = indexedDB.open('CasosAI', 1);
-  req.onupgradeneeded = e => e.target.result.createObjectStore('casos', { keyPath:'id', autoIncrement:true });
+  req.onupgradeneeded = e => e.target.result.createObjectStore('casos', {keyPath:'id',autoIncrement:true});
   req.onsuccess = e => { db = e.target.result; };
 }
-function saveToDB(data){
-  if (!db) return;
-  const tx = db.transaction('casos','readwrite');
-  tx.objectStore('casos').add({ ...data, savedAt: new Date().toISOString() });
-}
-function loadHistory(cb){
-  if (!db) return cb([]);
-  const tx = db.transaction('casos','readonly');
-  const req = tx.objectStore('casos').getAll();
-  req.onsuccess = e => cb(e.target.result.reverse());
-}
+function saveToDB(data){ if(!db)return; db.transaction('casos','readwrite').objectStore('casos').add({...data,savedAt:new Date().toISOString()}); }
+function loadHistory(cb){ if(!db)return cb([]); const req=db.transaction('casos','readonly').objectStore('casos').getAll(); req.onsuccess=e=>cb(e.target.result.reverse()); }
 
 // ─────────────────────────────────────────────
 // SYLLABUS IMPORT
 // ─────────────────────────────────────────────
 function openImportModal(){ document.getElementById('importModal').classList.add('open'); }
 function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); }
-
-function handleDrop(e){
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file && file.name.endsWith('.json')) processImportFile(file);
-}
-
-function handleImportFile(e){
-  const file = e.target.files[0];
-  if (file) processImportFile(file);
-}
+function handleDrop(e){ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.name.endsWith('.json'))processImportFile(f); }
+function handleImportFile(e){ const f=e.target.files[0]; if(f)processImportFile(f); }
 
 function processImportFile(file){
   const reader = new FileReader();
   reader.onload = ev => {
     try {
       const data = JSON.parse(ev.target.result);
-      if (data._source !== 'SyllabusAI') throw new Error('Archivo no generado por SyllabusAI');
+      if (data._source !== 'SyllabusAI') throw new Error('No es un archivo de SyllabusAI');
       syllabusImport = data;
       applyImport(data);
       closeImportModal();
-      showToast('✅ Guía de SyllabusAI importada correctamente');
-    } catch(err){ showToast('❌ Error: ' + err.message); }
+      showToast('✅ Guía de SyllabusAI importada');
+    } catch(err){ showToast('❌ '+err.message); }
   };
   reader.readAsText(file);
 }
 
 function applyImport(data){
-  // Fill fields
-  if (data.asignatura) document.getElementById('fAsignatura').value = data.asignatura;
-
-  // Populate bloque select
-  if (data.bloques_temario?.length){
-    const sel = document.getElementById('fBloqueSelect');
-    sel.innerHTML = '<option value="">— selecciona un bloque —</option>' +
-      data.bloques_temario.map(b=>`<option value="${b.titulo}">${b.numero}. ${b.titulo}</option>`).join('');
-    sel.style.display = 'block';
-    sel.onchange = () => { document.getElementById('fBloque').value = sel.value; };
+  if(data.asignatura) document.getElementById('fAsignatura').value = data.asignatura;
+  if(data.bloques_temario?.length){
+    const sel=document.getElementById('fBloqueSelect');
+    sel.innerHTML='<option value="">— bloque —</option>'+data.bloques_temario.map(b=>`<option value="${b.titulo}">${b.numero}. ${b.titulo}</option>`).join('');
+    sel.style.display='block';
+    sel.onchange=()=>{ document.getElementById('fBloque').value=sel.value; };
   }
-
-  // Populate competencias select
-  const allComps = [...(data.competencias_genericas||[]), ...(data.competencias_especificas||[])];
-  if (allComps.length){
-    const csel = document.getElementById('fCompSelect');
-    csel.innerHTML = '<option value="">— selecciona competencias —</option>' +
-      allComps.map(c=>`<option value="${c.codigo}">[${c.codigo}] ${(c.texto||'').substring(0,60)}…</option>`).join('');
-    csel.style.display = 'block';
-    csel.onchange = () => {
-      const cur = document.getElementById('fCompetencias').value;
-      const codes = cur ? cur.split(',').map(s=>s.trim()) : [];
-      if (!codes.includes(csel.value) && csel.value) codes.push(csel.value);
-      document.getElementById('fCompetencias').value = codes.filter(Boolean).join(', ');
+  const allComps=[...(data.competencias_genericas||[]),...(data.competencias_especificas||[])];
+  if(allComps.length){
+    const csel=document.getElementById('fCompSelect');
+    csel.innerHTML='<option value="">— competencia —</option>'+allComps.map(c=>`<option value="${c.codigo}">[${c.codigo}] ${(c.texto||'').substring(0,55)}…</option>`).join('');
+    csel.style.display='block';
+    csel.onchange=()=>{
+      const cur=document.getElementById('fCompetencias').value;
+      const codes=cur?cur.split(',').map(s=>s.trim()):[];
+      if(csel.value&&!codes.includes(csel.value))codes.push(csel.value);
+      document.getElementById('fCompetencias').value=codes.filter(Boolean).join(', ');
     };
   }
-
-  // Show imported tag
-  document.getElementById('importedTag').style.display = 'block';
-  document.getElementById('importedName').textContent = data.asignatura;
-  document.getElementById('importDropZone').style.display = 'none';
+  document.getElementById('importedTag').style.display='block';
+  document.getElementById('importedName').textContent='🔗 '+data.asignatura;
+  document.getElementById('importDropZone').style.display='none';
 }
 
 // ─────────────────────────────────────────────
 // HISTORY PANEL
 // ─────────────────────────────────────────────
 function toggleHistory(){
-  const panel = document.getElementById('historyPanel');
-  const overlay = document.getElementById('overlay');
-  if (!panel.classList.contains('open')){
-    loadHistory(items => {
-      const list = document.getElementById('historyList');
-      if (!items.length){ list.innerHTML = '<div style="text-align:center;padding:40px 0;color:#888;font-size:14px">📭 Sin casos guardados aún.</div>'; return; }
-      list.innerHTML = items.map(it=>`
+  const panel=document.getElementById('historyPanel'), overlay=document.getElementById('overlay');
+  if(!panel.classList.contains('open')){
+    loadHistory(items=>{
+      const list=document.getElementById('historyList');
+      if(!items.length){ list.innerHTML='<div style="text-align:center;padding:40px 0;color:#888;font-size:13px">📭 Sin casos guardados aún.</div>'; return; }
+      list.innerHTML=items.map(it=>`
         <div class="hp-item" onclick="loadHistoryItem(${it.id})">
           <div class="hp-item-title">${it.titulo||it.tema}</div>
           <div class="hp-item-meta">${TIPO_META[it.tipo]?.label||it.tipo} · ${it.asignatura}<br>${new Date(it.savedAt).toLocaleString('es-ES')}</div>
         </div>`).join('');
     });
   }
-  panel.classList.toggle('open');
-  overlay.classList.toggle('show');
+  panel.classList.toggle('open'); overlay.classList.toggle('show');
 }
 
 function closeAllPanels(){
@@ -675,32 +816,29 @@ function closeAllPanels(){
 }
 
 function loadHistoryItem(id){
-  loadHistory(items => {
-    const item = items.find(i=>i.id===id);
-    if (item){ currentCasoData = item; renderCaso(item); closeAllPanels(); }
-  });
+  loadHistory(items=>{ const item=items.find(i=>i.id===id); if(item){currentCasoData=item;renderCaso(item);closeAllPanels();} });
 }
 
 // ─────────────────────────────────────────────
-// MAIN GENERATION
+// GENERATION
 // ─────────────────────────────────────────────
 async function generateCaso(){
   const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey){ document.getElementById('apiWarning').classList.add('show'); showToast('⚠️ Introduce tu API Key'); return; }
+  if(!apiKey){ document.getElementById('apiWarning').classList.add('show'); showToast('⚠️ Introduce tu API Key'); return; }
   document.getElementById('apiWarning').classList.remove('show');
-
   const tema = document.getElementById('fTema').value.trim();
-  if (!tema){ showToast('⚠️ El tema del caso es obligatorio'); return; }
+  if(!tema){ showToast('⚠️ El tema es obligatorio'); return; }
 
-  const inputs = {
+  const inp = {
     apiKey,
     tipo: currentTipo,
-    asignatura: document.getElementById('fAsignatura').value.trim() || 'No especificada',
+    tipoLabel: TIPO_META[currentTipo].label,
+    asignatura: document.getElementById('fAsignatura').value.trim()||'No especificada',
     tema,
     bloque: document.getElementById('fBloque').value.trim(),
     nivel: document.getElementById('fNivel').value,
     dificultad: document.getElementById('fDificultad').value,
-    preguntas: parseInt(document.getElementById('fPreguntas').value) || 4,
+    preguntas: parseInt(document.getElementById('fPreguntas').value)||4,
     duracion: document.getElementById('fDuracion').value,
     modalidad: document.getElementById('fModalidad').value,
     contexto: document.getElementById('fContexto').value,
@@ -716,16 +854,16 @@ async function generateCaso(){
     } : null,
   };
 
-  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('emptyState').style.display='none';
   document.getElementById('resultPanel').classList.remove('active');
+  document.getElementById('promptEditorWrap').classList.remove('active');
   showProgress();
 
-  const btn = document.getElementById('btnGen');
-  btn.disabled = true;
-  document.getElementById('btnGenText').textContent = 'Generando…';
+  const btn=document.getElementById('btnGen');
+  btn.disabled=true; document.getElementById('btnGenText').textContent='Generando…';
 
   try {
-    const result = await runPipeline(inputs);
+    const result = await runPipeline(inp);
     currentCasoData = result;
     saveToDB(result);
     hideProgress();
@@ -733,577 +871,335 @@ async function generateCaso(){
     showToast('✅ Caso generado y guardado');
   } catch(err){
     hideProgress();
-    showToast('❌ ' + err.message);
-    document.getElementById('emptyState').style.display = 'block';
+    showToast('❌ '+err.message);
+    document.getElementById('emptyState').style.display='block';
   } finally {
-    btn.disabled = false;
-    document.getElementById('btnGenText').textContent = 'Generar Caso Práctico';
+    btn.disabled=false; document.getElementById('btnGenText').textContent='Generar Caso Práctico';
   }
 }
 
 function showProgress(){
-  const wrap = document.getElementById('progressWrap');
-  wrap.classList.add('active');
-  document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>`
+  document.getElementById('progressWrap').classList.add('active');
+  document.getElementById('agentsGrid').innerHTML=AGENT_DEFS.map(a=>`
     <div class="agent-card pending" id="agent-${a.id}">
-      <div class="a-name">${a.name}</div>
-      <div class="a-status">${a.desc}</div>
+      <div class="a-name">${a.name}</div><div class="a-status">${a.desc}</div>
     </div>`).join('');
   setProgress(0);
 }
 function hideProgress(){ document.getElementById('progressWrap').classList.remove('active'); }
-function setAgentState(id, state, msg){
-  const el = document.getElementById('agent-'+id);
-  if (!el) return;
-  el.className = 'agent-card '+state;
-  if (msg) el.querySelector('.a-status').textContent = msg;
-}
-function setProgress(p){ document.getElementById('progressBar').style.width = p+'%'; }
+function setAgentState(id,state,msg){ const el=document.getElementById('agent-'+id); if(!el)return; el.className='agent-card '+state; if(msg)el.querySelector('.a-status').textContent=msg; }
+function setProgress(p){ document.getElementById('progressBar').style.width=p+'%'; }
 
 // ─────────────────────────────────────────────
 // PIPELINE
 // ─────────────────────────────────────────────
 async function runPipeline(inp){
+  const {apiKey,model} = inp;
   let ctx = {};
-  const { apiKey, model } = inp;
 
-  // AGENT 1: Pedagógico
+  const tipoInstrucciones = {
+    caso_narrativo:'Crea una situación real/ficticia con personajes, empresa o institución, datos relevantes y un problema central bien definido.',
+    problema_cuantitativo:'Crea un enunciado con datos numéricos precisos, tablas o valores para resolver matemáticamente. Incluye todos los datos necesarios.',
+    supuesto_practico:'Crea un supuesto tipo examen/oposición, conciso y bien acotado, con situación jurídica, técnica o profesional clara.',
+    caso_harvard:'Crea un caso extenso con contexto organizacional rico, dilema estratégico y múltiples perspectivas en conflicto.',
+    roleplay:'Define los roles de los participantes (mín. 2), el escenario, los objetivos de cada rol y el conflicto a resolver.',
+    proyecto_corto:'Define el enunciado del proyecto, el entregable esperado, las fases sugeridas y los recursos disponibles.',
+    analisis_critico:'Proporciona un texto, conjunto de datos o situación que el estudiante debe analizar críticamente, con perspectivas contrapuestas.',
+    debate_seminario:'Plantea la cuestión central, las posiciones posibles y los argumentos de partida de cada posición.',
+  };
+
+  // ── AGENT 1: Pedagógico
   setAgentState('ped','running','Definiendo objetivos…');
-  ctx.pedagogico = await callOpenAI(apiKey, model, promptPedagogico(inp));
+  const syllabusCtxStr = inp.syllabusCtx
+    ? `\nContexto importado de SyllabusAI:\n- Titulación: ${inp.syllabusCtx.titulacion}\n- Competencias: ${JSON.stringify(inp.syllabusCtx.competencias_especificas)}\n- RdA: ${JSON.stringify(inp.syllabusCtx.resultados_aprendizaje)}`
+    : '';
+  ctx.pedagogico = await callOpenAI(apiKey, model,
+    fillPrompt(getPrompt('ped'), {...inp, syllabusCtx: syllabusCtxStr, tipoInstruccion: tipoInstrucciones[inp.tipo]||''})
+  );
   setAgentState('ped','done','✓ Objetivos definidos'); setProgress(16);
 
-  // AGENT 2: Contexto / Narrativa
+  // ── AGENT 2: Contexto
   setAgentState('ctx','running','Creando contexto…');
-  ctx.contexto = await callOpenAI(apiKey, model, promptContexto(inp, ctx));
+  ctx.contexto = await callOpenAI(apiKey, model,
+    fillPrompt(getPrompt('ctx'), {...inp, tipoInstruccion: tipoInstrucciones[inp.tipo]||''})
+  );
   setAgentState('ctx','done','✓ Contexto creado'); setProgress(32);
 
-  // AGENT 3: Preguntas
+  // ── AGENT 3: Preguntas
   setAgentState('preg','running','Formulando preguntas…');
-  ctx.preguntas = await callOpenAI(apiKey, model, promptPreguntas(inp, ctx));
+  ctx.preguntas = await callOpenAI(apiKey, model,
+    fillPrompt(getPrompt('preg'), {
+      ...inp,
+      titulo: ctx.contexto?.titulo||inp.tema,
+      contextoNarrativo: (ctx.contexto?.contexto_narrativo||'').substring(0,500),
+    })
+  );
   setAgentState('preg','done','✓ Preguntas formuladas'); setProgress(50);
 
-  // AGENT 4: Solución
-  if (inp.solucion !== 'no'){
+  // ── AGENT 4: Solución
+  if(inp.solucion !== 'no'){
     setAgentState('sol','running','Desarrollando solución…');
-    ctx.solucion = await callOpenAI(apiKey, model, promptSolucion(inp, ctx));
+    ctx.solucion = await callOpenAI(apiKey, model,
+      fillPrompt(getPrompt('sol'), {
+        ...inp,
+        titulo: ctx.contexto?.titulo||inp.tema,
+        tipoSolucion: inp.solucion,
+        contextoNarrativo: (ctx.contexto?.contexto_narrativo||'').substring(0,600),
+        preguntas: JSON.stringify(ctx.preguntas?.preguntas||[]),
+      })
+    );
     setAgentState('sol','done','✓ Solución desarrollada');
   } else {
     setAgentState('sol','done','— Omitida');
-    ctx.solucion = { contenido:'No solicitada', criterios:[] };
+    ctx.solucion = {contenido:'No solicitada',puntos_clave:[],errores_comunes:[],criterios:[]};
   }
   setProgress(66);
 
-  // AGENT 5: Rúbrica
+  // ── AGENT 5: Rúbrica
   setAgentState('rub','running','Generando rúbrica…');
-  ctx.rubrica = await callOpenAI(apiKey, model, promptRubrica(inp, ctx));
+  ctx.rubrica = await callOpenAI(apiKey, model,
+    fillPrompt(getPrompt('rub'), {
+      ...inp,
+      objetivos: JSON.stringify(ctx.pedagogico?.objetivos_aprendizaje||[]),
+      preguntasTexto: (ctx.preguntas?.preguntas||[]).map(p=>p.texto).join(' | '),
+    })
+  );
   setAgentState('rub','done','✓ Rúbrica generada'); setProgress(83);
 
-  // AGENT 6: Variantes
+  // ── AGENT 6: Variantes
   setAgentState('var','running','Generando variantes…');
-  ctx.variantes = await callOpenAI(apiKey, model, promptVariantes(inp, ctx));
+  ctx.variantes = await callOpenAI(apiKey, model,
+    fillPrompt(getPrompt('var'), {
+      ...inp,
+      titulo: ctx.contexto?.titulo||inp.tema,
+    })
+  );
   setAgentState('var','done','✓ Variantes generadas'); setProgress(100);
 
   const meta = TIPO_META[inp.tipo];
   return {
-    tipo: inp.tipo,
-    tipo_label: meta.label,
-    asignatura: inp.asignatura,
-    tema: inp.tema,
-    titulo: ctx.contexto?.titulo || inp.tema,
-    nivel: inp.nivel,
-    dificultad: inp.dificultad,
-    duracion: inp.duracion,
-    modalidad: inp.modalidad,
-    contextoGeo: inp.contexto,
-    idioma: inp.idioma,
-    pedagogico: ctx.pedagogico,
-    contexto: ctx.contexto,
-    preguntas: ctx.preguntas,
-    solucion: ctx.solucion,
-    rubrica: ctx.rubrica,
-    variantes: ctx.variantes,
-    generatedAt: new Date().toISOString(),
+    tipo:inp.tipo, tipo_label:meta.label,
+    asignatura:inp.asignatura, tema:inp.tema,
+    titulo: ctx.contexto?.titulo||inp.tema,
+    nivel:inp.nivel, dificultad:inp.dificultad, duracion:inp.duracion,
+    modalidad:inp.modalidad, contextoGeo:inp.contexto, idioma:inp.idioma,
+    pedagogico:ctx.pedagogico, contexto:ctx.contexto,
+    preguntas:ctx.preguntas, solucion:ctx.solucion,
+    rubrica:ctx.rubrica, variantes:ctx.variantes,
+    generatedAt:new Date().toISOString(),
   };
 }
 
-// ─────────────────────────────────────────────
-// PROMPTS
-// ─────────────────────────────────────────────
-function promptPedagogico(inp){
-  const syllabusCtx = inp.syllabusCtx ? `\nContexto de SyllabusAI:\n- Titulación: ${inp.syllabusCtx.titulacion}\n- Competencias: ${JSON.stringify(inp.syllabusCtx.competencias_especificas)}\n- RdA relevantes: ${JSON.stringify(inp.syllabusCtx.resultados_aprendizaje)}` : '';
-  return `Eres un experto en diseño pedagógico universitario especializado en ${TIPO_META[inp.tipo].label}.
-Devuelve JSON:
-{
-  "objetivos_aprendizaje": ["objetivo 1","objetivo 2","objetivo 3"],
-  "competencias_activadas": ["CE1: ...","CE2: ..."],
-  "nivel_bloom_principal": "Aplicación",
-  "justificacion_pedagogica": "párrafo breve explicando por qué este tipo de actividad es adecuada",
-  "indicaciones_docente": "recomendaciones para el profesor al usar esta actividad"
-}
-Asignatura: ${inp.asignatura} | Tema: ${inp.tema} | Tipo: ${TIPO_META[inp.tipo].label}
-Nivel: ${inp.nivel} | Dificultad: ${inp.dificultad} | Duración: ${inp.duracion} | Modalidad: ${inp.modalidad}
-Competencias solicitadas: ${inp.competencias||'Elige las más apropiadas'}
-${syllabusCtx}
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
-}
-
-function promptContexto(inp, ctx){
-  const tipoInstr = {
-    caso_narrativo: 'Crea una situación real/ficticia con personajes, empresa o institución, datos relevantes y un problema central bien definido.',
-    problema_cuantitativo: 'Crea un enunciado con datos numéricos precisos, tablas o valores para resolver matemáticamente.',
-    supuesto_practico: 'Crea un supuesto tipo examen/oposición con situación concisa y bien acotada.',
-    caso_harvard: 'Crea un caso extenso con contexto organizacional rico, dilema estratégico y múltiples perspectivas en conflicto.',
-    roleplay: 'Define los roles de los participantes, el escenario y los objetivos de negociación o interacción de cada uno.',
-    proyecto_corto: 'Define el enunciado del proyecto, el entregable esperado, las fases sugeridas y los recursos disponibles.',
-    analisis_critico: 'Proporciona un texto, conjunto de datos o situación que el estudiante debe analizar críticamente.',
-    debate_seminario: 'Plantea la cuestión central del debate, las posiciones posibles y los argumentos que deben manejarse.',
-  };
-  return `Eres un experto en redacción de material didáctico universitario. Tipo de actividad: ${TIPO_META[inp.tipo].label}.
-${tipoInstr[inp.tipo]}
-
-Devuelve JSON:
-{
-  "titulo": "Título del caso (máx 10 palabras, sin 'Caso:')",
-  "contexto_narrativo": "El texto del caso/enunciado completo (300-500 palabras). Debe ser rico en detalles realistas y relevantes.",
-  "datos_clave": [
-    {"etiqueta":"Dato 1","valor":"..."},
-    {"etiqueta":"Dato 2","valor":"..."}
-  ],
-  "recursos_adicionales": ["recurso/dato/tabla adicional 1","recurso 2"],
-  "pregunta_central": "La pregunta o reto principal del caso (1 frase)"
-}
-
-Asignatura: ${inp.asignatura} | Tema: ${inp.tema} | Bloque: ${inp.bloque||'—'}
-Contexto geográfico: ${inp.contextoGeo||inp.contexto}
-Datos extra del docente: ${inp.contextoExtra||'ninguno'}
-Objetivos: ${JSON.stringify(ctx.pedagogico?.objetivos_aprendizaje)}
-Nivel: ${inp.nivel} | Dificultad: ${inp.dificultad}
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
-}
-
-function promptPreguntas(inp, ctx){
-  return `Eres un experto en evaluación universitaria con la taxonomía de Bloom.
-Genera exactamente ${inp.preguntas} preguntas para este caso.
-
-Devuelve JSON:
-{
-  "preguntas": [
-    {
-      "numero": 1,
-      "texto": "Enunciado completo de la pregunta...",
-      "nivel_bloom": "Comprensión",
-      "bloom_nivel_num": 2,
-      "peso_sugerido": 25,
-      "indicacion": "Breve orientación sobre qué se espera en la respuesta"
-    }
-  ]
-}
-
-Caso: "${ctx.contexto?.titulo}"
-Contexto: "${(ctx.contexto?.contexto_narrativo||'').substring(0,400)}"
-Pregunta central: "${ctx.contexto?.pregunta_central}"
-Tipo: ${TIPO_META[inp.tipo].label} | Nivel: ${inp.nivel} | Dificultad: ${inp.dificultad}
-Distribución bloom: varía los niveles de forma progresiva (no todas al mismo nivel). Los pesos deben sumar 100.
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
-}
-
-function promptSolucion(inp, ctx){
-  const tipo = inp.solucion;
-  return `Eres un experto docente universitario. Desarrolla la ${tipo==='completa'?'solución modelo completa':'guía de criterios de evaluación'} para este caso.
-
-Devuelve JSON:
-{
-  "tipo_solucion": "${tipo}",
-  "contenido": "Desarrollo completo de la respuesta a cada pregunta con explicación y justificación. Para problemas cuantitativos, incluye todos los pasos de cálculo.",
-  "puntos_clave": ["punto clave 1","punto clave 2","punto clave 3"],
-  "errores_comunes": ["error frecuente 1","error frecuente 2"],
-  "criterios": [
-    {"pregunta": 1, "criterio": "Se espera que el estudiante...", "indicadores_excelente": "...", "indicadores_insuficiente": "..."}
-  ]
-}
-
-Preguntas: ${JSON.stringify(ctx.preguntas?.preguntas)}
-Contexto del caso: ${(ctx.contexto?.contexto_narrativo||'').substring(0,500)}
-Nivel: ${inp.nivel} | Asignatura: ${inp.asignatura}
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
-}
-
-function promptRubrica(inp, ctx){
-  return `Eres un experto en evaluación por rúbricas en educación superior.
-Genera una rúbrica de evaluación para este caso con 4-5 criterios.
-
-Devuelve JSON:
-{
-  "criterios": [
-    {
-      "criterio": "Comprensión del problema",
-      "peso": 20,
-      "excelente": "Descripción del nivel 4 (9-10)",
-      "notable": "Descripción del nivel 3 (7-8)",
-      "aprobado": "Descripción del nivel 2 (5-6)",
-      "insuficiente": "Descripción del nivel 1 (0-4)"
-    }
-  ],
-  "nota_global": "Criterio para la nota final: ponderación de criterios",
-  "comentarios_uso": "Cómo usar esta rúbrica en clase"
-}
-
-Los pesos deben sumar 100. Adapta los criterios al tipo de actividad: ${TIPO_META[inp.tipo].label}.
-Objetivos pedagógicos: ${JSON.stringify(ctx.pedagogico?.objetivos_aprendizaje)}
-Preguntas evaluadas: ${(ctx.preguntas?.preguntas||[]).map(p=>p.texto).join(' | ')}
-Nivel: ${inp.nivel}
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
-}
-
-function promptVariantes(inp, ctx){
-  return `Eres un experto en diseño curricular universitario. Genera 3 variantes del siguiente caso.
-
-Devuelve JSON:
-{
-  "variantes": [
-    {
-      "label": "Versión más sencilla",
-      "titulo": "...",
-      "descripcion": "Cómo modificar el caso para reducir su dificultad (2-3 frases)",
-      "cambios": "Qué datos, preguntas o contexto cambiarías"
-    },
-    {
-      "label": "Versión avanzada",
-      "titulo": "...",
-      "descripcion": "Cómo hacer el caso más desafiante",
-      "cambios": "Qué añadirías o complicarías"
-    },
-    {
-      "label": "Versión interdisciplinar",
-      "titulo": "...",
-      "descripcion": "Cómo conectar este caso con otra disciplina",
-      "cambios": "Qué elementos de otra área incorporarías"
-    }
-  ]
-}
-
-Caso original: "${ctx.contexto?.titulo}" — ${TIPO_META[inp.tipo].label}
-Asignatura: ${inp.asignatura} | Nivel original: ${inp.nivel} | Dificultad: ${inp.dificultad}
-Idioma: ${inp.idioma}
-Responde SOLO con JSON.`;
+// ── Sustituye variables en el prompt ──
+function fillPrompt(template, vars){
+  return template.replace(/\{(\w+)\}/g, (match, key) => {
+    const v = vars[key];
+    if(v === undefined || v === null) return match; // dejar sin tocar si no existe
+    if(typeof v === 'object') return JSON.stringify(v).substring(0,400);
+    return String(v);
+  });
 }
 
 // ─────────────────────────────────────────────
 // OPENAI CALL
 // ─────────────────────────────────────────────
 async function callOpenAI(apiKey, model, prompt){
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('https://api.openai.com/v1/chat/completions',{
     method:'POST',
-    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-    body: JSON.stringify({
-      model, temperature:0.75, max_tokens:2500,
-      messages:[{ role:'user', content:prompt }],
-      response_format:{ type:'json_object' }
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model, temperature:0.75, max_tokens:2500,
+      messages:[{role:'user',content:prompt}],
+      response_format:{type:'json_object'}
     })
   });
-  if (!res.ok){ const e = await res.json(); throw new Error(e.error?.message || res.statusText); }
+  if(!res.ok){ const e=await res.json(); throw new Error(e.error?.message||res.statusText); }
   const data = await res.json();
-  try { return JSON.parse(data.choices[0].message.content); }
-  catch { return data.choices[0].message.content; }
+  try{ return JSON.parse(data.choices[0].message.content); }
+  catch{ return data.choices[0].message.content; }
 }
 
 // ─────────────────────────────────────────────
-// RENDER CASO
+// RENDER
 // ─────────────────────────────────────────────
 function renderCaso(d){
-  const meta = TIPO_META[d.tipo] || TIPO_META['caso_narrativo'];
-
-  // Badge & title
+  const meta = TIPO_META[d.tipo]||TIPO_META['caso_narrativo'];
   const badge = document.getElementById('casoBadge');
-  badge.style.background = meta.bg;
-  badge.style.color = meta.color;
-  badge.textContent = meta.icon + ' ' + meta.label;
-
-  document.getElementById('casoTitleDisplay').textContent = d.titulo || d.tema;
-
-  const casoMeta = document.getElementById('casoMeta');
-  casoMeta.innerHTML = [d.asignatura, d.nivel, d.dificultad, d.duracion, d.modalidad, d.contextoGeo]
+  badge.style.background=meta.bg; badge.style.color=meta.color;
+  badge.textContent=meta.icon+' '+meta.label;
+  document.getElementById('casoTitleDisplay').textContent=d.titulo||d.tema;
+  document.getElementById('casoMeta').innerHTML=[d.asignatura,d.nivel,d.dificultad,d.duracion,d.modalidad,d.contextoGeo]
     .filter(Boolean).map(v=>`<div class="caso-meta-chip">${v}</div>`).join('');
 
-  // Body sections
   let html = '';
 
-  // 1. Objetivos de aprendizaje
+  // Objetivos
   const objs = safeArr(d.pedagogico,'objetivos_aprendizaje');
-  if (objs.length){
-    html += casoSection('🎯','Objetivos de Aprendizaje', `<div class="objetivos-grid">${objs.map((o,i)=>`<div class="objetivo-pill"><span class="objetivo-num">O${i+1}</span>${o}</div>`).join('')}</div>`);
-  }
+  if(objs.length) html+=sec('🎯','Objetivos de Aprendizaje',
+    `<div class="objetivos-grid">${objs.map((o,i)=>`<div class="objetivo-pill"><span class="objetivo-num">O${i+1}</span>${o}</div>`).join('')}</div>`);
 
-  // 2. Contexto / Enunciado
+  // Contexto / Enunciado
   const nar = safeStr(d.contexto,'contexto_narrativo');
-  const datosKey = safeArr(d.contexto,'datos_clave');
-  let contextHtml = `<div class="caso-section-content">${nar}</div>`;
-  if (datosKey.length){
-    contextHtml += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px">`;
-    datosKey.forEach(dk=>{ contextHtml+=`<div class="recurso-card"><div class="rc-label">${dk.etiqueta||'Dato'}</div>${dk.valor||dk}</div>`; });
-    contextHtml += '</div>';
+  const datosK = safeArr(d.contexto,'datos_clave');
+  let ctxHtml = `<div class="caso-section-content">${nar}</div>`;
+  if(datosK.length){
+    ctxHtml+=`<div class="datos-grid">${datosK.map(dk=>`<div class="dato-card"><div class="dc-label">${dk.etiqueta||'Dato'}</div>${dk.valor||dk}</div>`).join('')}</div>`;
   }
-  const pregCentral = safeStr(d.contexto,'pregunta_central');
-  if (pregCentral){ contextHtml += `<div style="margin-top:14px;padding:12px 16px;background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:5px;font-weight:600;font-size:14px">❓ ${pregCentral}</div>`; }
-  html += casoSection('📖', d.tipo==='problema_cuantitativo'?'Enunciado del Problema':'Contexto y Situación', contextHtml);
+  const pregC = safeStr(d.contexto,'pregunta_central');
+  if(pregC) ctxHtml+=`<div style="margin-top:12px;padding:10px 14px;background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:5px;font-weight:600;font-size:13.5px">❓ ${pregC}</div>`;
+  html+=sec('📖',d.tipo==='problema_cuantitativo'?'Enunciado del Problema':'Contexto y Situación', ctxHtml);
 
   // Recursos adicionales
   const recAd = safeArr(d.contexto,'recursos_adicionales');
-  if (recAd.length){
-    html += casoSection('📎','Recursos y Datos Adicionales',
-      `<div class="recursos-grid">${recAd.map(r=>`<div class="recurso-card"><div class="rc-label">Recurso</div>${r}</div>`).join('')}</div>`);
-  }
+  if(recAd.length) html+=sec('📎','Recursos y Datos Adicionales',
+    `<div class="datos-grid">${recAd.map(r=>`<div class="dato-card"><div class="dc-label">Recurso</div>${r}</div>`).join('')}</div>`);
 
-  // 3. Preguntas
+  // Preguntas
   const pregs = safeArr(d.preguntas,'preguntas');
-  let pregHtml = '';
+  let pregHtml='';
   pregs.forEach(p=>{
-    const bloomClass = 'bloom-'+(p.bloom_nivel_num||3);
-    pregHtml += `<div class="pregunta-item">
-      <div style="display:flex;align-items:flex-start;gap:8px">
-        <span class="pregunta-num">${p.numero||'?'}</span>
-        <div style="flex:1">
-          <div class="pregunta-text">${p.texto||p}</div>
-          <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
-            <span class="pregunta-bloom ${bloomClass}">${p.nivel_bloom||''}</span>
-            ${p.peso_sugerido?`<span style="font-size:11px;color:#888;padding-top:3px">${p.peso_sugerido}% de la nota</span>`:''}
-          </div>
-          ${p.indicacion?`<div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;font-style:italic">${p.indicacion}</div>`:''}
+    const bc='bloom-'+(p.bloom_nivel_num||3);
+    pregHtml+=`<div class="pregunta-item"><div style="display:flex;align-items:flex-start;gap:7px">
+      <span class="pregunta-num">${p.numero||'?'}</span>
+      <div style="flex:1">
+        <div class="pregunta-text">${p.texto||p}</div>
+        <div style="margin-top:5px;display:flex;gap:7px;flex-wrap:wrap">
+          <span class="pregunta-bloom ${bc}">${p.nivel_bloom||''}</span>
+          ${p.peso_sugerido?`<span style="font-size:11px;color:#888;padding-top:2px">${p.peso_sugerido}% nota</span>`:''}
         </div>
-      </div>
-    </div>`;
+        ${p.indicacion?`<div style="font-size:12px;color:var(--ink-soft);margin-top:5px;font-style:italic">${p.indicacion}</div>`:''}
+      </div></div></div>`;
   });
-  html += casoSection('❓',`Preguntas${pregs.length?' ('+pregs.length+')':''}`, pregHtml);
+  html+=sec('❓',`Preguntas${pregs.length?' ('+pregs.length+')':''}`, pregHtml);
 
-  // 4. Solución
-  if (d.solucion && d.solucion.contenido !== 'No solicitada'){
-    const solContent = safeStr(d.solucion,'contenido');
-    const puntos = safeArr(d.solucion,'puntos_clave');
-    const errores = safeArr(d.solucion,'errores_comunes');
-    let solHtml = `<div class="solucion-wrap">
-      <div class="solucion-title">✅ ${d.solucion.tipo_solucion==='criterios'?'Criterios de Evaluación':'Solución Modelo'}</div>
-      <div class="solucion-content">${solContent}</div>`;
-    if (puntos.length) solHtml += `<div style="margin-top:14px"><strong style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent-dk)">Puntos clave:</strong><ul style="margin-top:6px;padding-left:20px">${puntos.map(p=>`<li style="font-size:13.5px;margin-bottom:4px">${p}</li>`).join('')}</ul></div>`;
-    if (errores.length) solHtml += `<div style="margin-top:12px"><strong style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--amber)">Errores frecuentes:</strong><ul style="margin-top:6px;padding-left:20px">${errores.map(e=>`<li style="font-size:13.5px;margin-bottom:4px;color:var(--ink-soft)">${e}</li>`).join('')}</ul></div>`;
-    solHtml += '</div>';
-    html += casoSection('✅','Solución y Criterios de Evaluación', solHtml);
+  // Solución
+  if(d.solucion?.contenido && d.solucion.contenido!=='No solicitada'){
+    const pts=safeArr(d.solucion,'puntos_clave'), errs=safeArr(d.solucion,'errores_comunes');
+    let solHtml=`<div class="solucion-wrap"><div class="solucion-title">✅ ${d.solucion.tipo_solucion==='criterios'?'Criterios de Evaluación':'Solución Modelo'}</div>
+      <div class="solucion-content">${safeStr(d.solucion,'contenido')}</div>`;
+    if(pts.length) solHtml+=`<div style="margin-top:12px"><strong style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent-dk)">Puntos clave:</strong><ul style="margin-top:5px;padding-left:18px">${pts.map(p=>`<li style="font-size:13px;margin-bottom:3px">${p}</li>`).join('')}</ul></div>`;
+    if(errs.length) solHtml+=`<div style="margin-top:10px"><strong style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--amber)">Errores frecuentes:</strong><ul style="margin-top:5px;padding-left:18px">${errs.map(e=>`<li style="font-size:13px;margin-bottom:3px;color:var(--ink-soft)">${e}</li>`).join('')}</ul></div>`;
+    solHtml+='</div>';
+    html+=sec('✅','Solución y Criterios', solHtml);
   }
 
-  // 5. Rúbrica
-  const rubCriterios = safeArr(d.rubrica,'criterios');
-  if (rubCriterios.length){
-    let rubHtml = `<table class="rubrica-table"><thead><tr><th>Criterio</th><th>Peso</th><th>Excelente (9-10)</th><th>Notable (7-8)</th><th>Aprobado (5-6)</th><th>Insuficiente (0-4)</th></tr></thead><tbody>`;
-    rubCriterios.forEach(c=>{ rubHtml+=`<tr><td><strong>${c.criterio}</strong></td><td><strong>${c.peso||0}%</strong></td><td>${c.excelente||''}</td><td>${c.notable||''}</td><td>${c.aprobado||''}</td><td>${c.insuficiente||''}</td></tr>`; });
-    rubHtml += '</tbody></table>';
-    if (d.rubrica?.comentarios_uso){ rubHtml+=`<div style="margin-top:12px;font-size:13px;color:var(--ink-soft);padding:10px 14px;background:var(--surface);border-radius:6px">💡 ${d.rubrica.comentarios_uso}</div>`; }
-    html += casoSection('📊','Rúbrica de Evaluación', rubHtml);
+  // Rúbrica
+  const rub=safeArr(d.rubrica,'criterios');
+  if(rub.length){
+    let rHtml=`<div style="overflow-x:auto"><table class="rubrica-table"><thead><tr><th>Criterio</th><th>Peso</th><th>Excelente (9-10)</th><th>Notable (7-8)</th><th>Aprobado (5-6)</th><th>Insuficiente (0-4)</th></tr></thead><tbody>`;
+    rub.forEach(c=>{ rHtml+=`<tr><td><strong>${c.criterio}</strong></td><td><strong>${c.peso||0}%</strong></td><td>${c.excelente||''}</td><td>${c.notable||''}</td><td>${c.aprobado||''}</td><td>${c.insuficiente||''}</td></tr>`; });
+    rHtml+=`</tbody></table></div>`;
+    if(d.rubrica?.comentarios_uso) rHtml+=`<div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);padding:9px 13px;background:var(--surface);border-radius:6px">💡 ${d.rubrica.comentarios_uso}</div>`;
+    html+=sec('📊','Rúbrica de Evaluación', rHtml);
   }
 
-  // 6. Variantes
-  const vars = safeArr(d.variantes,'variantes');
-  if (vars.length){
-    let varHtml = vars.map(v=>`
-      <div class="variante-card" onclick="showToast('Usa esta descripción para generar la variante')">
+  // Variantes
+  const vars=safeArr(d.variantes,'variantes');
+  if(vars.length){
+    html+=sec('🔀','Variantes Sugeridas',
+      vars.map(v=>`<div class="variante-card">
         <div class="variante-label">${v.label||'Variante'}</div>
         <div class="variante-title">${v.titulo||''}</div>
         <div class="variante-desc">${v.descripcion||''}</div>
-        ${v.cambios?`<div style="font-size:12px;color:var(--teal);margin-top:5px">🔧 ${v.cambios}</div>`:''}
-      </div>`).join('');
-    html += casoSection('🔀','Variantes Sugeridas', varHtml);
+        ${v.cambios?`<div style="font-size:11.5px;color:var(--teal);margin-top:4px">🔧 ${v.cambios}</div>`:''}
+      </div>`).join(''));
   }
 
-  // Indicaciones docente
-  const indDoc = safeStr(d.pedagogico,'indicaciones_docente');
-  if (indDoc){ html += casoSection('👨‍🏫','Notas para el Docente', `<div class="caso-section-content">${indDoc}</div>`); }
+  // Notas docente
+  const nd=safeStr(d.pedagogico,'indicaciones_docente');
+  if(nd) html+=sec('👨‍🏫','Notas para el Docente',`<div class="caso-section-content">${nd}</div>`);
 
-  document.getElementById('casoBody').innerHTML = html;
+  document.getElementById('casoBody').innerHTML=html;
   document.getElementById('resultPanel').classList.add('active');
-  document.getElementById('resultPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('resultPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function casoSection(icon, title, content){
+function sec(icon,title,content){
   return `<div class="caso-section">
     <div class="caso-section-header">
-      <div class="caso-section-icon" style="background:var(--accent-lt)">${icon}</div>
+      <div class="caso-section-icon">${icon}</div>
       <div class="caso-section-title">${title}</div>
-    </div>
-    ${content}
-  </div>`;
-}
-
-// ─────────────────────────────────────────────
-// GENERAR VARIANTE
-// ─────────────────────────────────────────────
-async function generateVariante(){
-  if (!currentCasoData){ showToast('Genera un caso primero'); return; }
-  showToast('🔀 Abre el sidebar, elige dificultad diferente y vuelve a generar');
+    </div>${content}</div>`;
 }
 
 // ─────────────────────────────────────────────
 // EXPORT WORD
 // ─────────────────────────────────────────────
 async function exportWord(){
-  if (!currentCasoData){ showToast('Genera un caso primero'); return; }
+  if(!currentCasoData){showToast('Genera un caso primero');return;}
   showToast('⏳ Generando Word…');
-  const d = currentCasoData;
-  const meta = TIPO_META[d.tipo]||TIPO_META['caso_narrativo'];
-
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-    AlignmentType, HeadingLevel, BorderStyle, WidthType, ShadingType } = docx;
-
-  const border = { style:BorderStyle.SINGLE, size:1, color:'CCCCCC' };
-  const borders = { top:border, bottom:border, left:border, right:border };
-
-  const H1 = txt => new Paragraph({ heading:HeadingLevel.HEADING_1, children:[new TextRun({ text:txt, bold:true, size:28, font:'Arial', color:'0D7A55' })] });
-  const H2 = txt => new Paragraph({ heading:HeadingLevel.HEADING_2, children:[new TextRun({ text:txt, bold:true, size:24, font:'Arial', color:'1a1f2e' })] });
-  const P  = txt => new Paragraph({ children:[new TextRun({ text:String(txt||''), size:22, font:'Arial' })], spacing:{ after:100 } });
-  const Blank = () => new Paragraph({ children:[new TextRun('')], spacing:{ after:80 } });
-
-  const children = [];
-
-  // Title page
-  children.push(new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({ text:meta.label.toUpperCase(), bold:true, size:32, font:'Arial', color:'0D7A55' })], spacing:{ after:160 } }));
-  children.push(new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({ text:d.titulo||d.tema, bold:true, size:36, font:'Arial' })], spacing:{ after:120 } }));
-  children.push(new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({ text:d.asignatura, size:24, font:'Arial', color:'555555' })], spacing:{ after:80 } }));
-  children.push(new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({ text:[d.nivel,d.dificultad,d.duracion,d.modalidad].filter(Boolean).join(' · '), size:22, font:'Arial', color:'888888' })], spacing:{ after:80 } }));
-  children.push(Blank()); children.push(Blank());
-
-  // 1. Objetivos
-  const objs = safeArr(d.pedagogico,'objetivos_aprendizaje');
-  if (objs.length){
-    children.push(H1('1. Objetivos de Aprendizaje'));
-    objs.forEach((o,i)=>children.push(P(`[O${i+1}] ${o}`)));
-    children.push(Blank());
-  }
-
-  // 2. Enunciado
-  children.push(H1('2. Contexto y Enunciado'));
-  children.push(P(safeStr(d.contexto,'contexto_narrativo')));
-  const datosK = safeArr(d.contexto,'datos_clave');
-  if (datosK.length){
-    children.push(H2('Datos clave'));
-    datosK.forEach(dk=>children.push(P(`• ${dk.etiqueta}: ${dk.valor||dk}`)));
-  }
-  const pCentral = safeStr(d.contexto,'pregunta_central');
-  if (pCentral){ children.push(Blank()); children.push(new Paragraph({ children:[new TextRun({ text:'Pregunta central: '+pCentral, bold:true, size:22, font:'Arial', color:'D97706' })] })); }
-  children.push(Blank());
-
-  // 3. Preguntas
-  children.push(H1('3. Preguntas'));
+  const d=currentCasoData;
+  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,AlignmentType,HeadingLevel,BorderStyle,WidthType,ShadingType}=docx;
+  const bd={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
+  const bds={top:bd,bottom:bd,left:bd,right:bd};
+  const H1=t=>new Paragraph({heading:HeadingLevel.HEADING_1,children:[new TextRun({text:t,bold:true,size:28,font:'Arial',color:'0D7A55'})]});
+  const H2=t=>new Paragraph({heading:HeadingLevel.HEADING_2,children:[new TextRun({text:t,bold:true,size:24,font:'Arial'})]});
+  const P=t=>new Paragraph({children:[new TextRun({text:String(t||''),size:22,font:'Arial'})],spacing:{after:100}});
+  const BL=()=>new Paragraph({children:[new TextRun('')],spacing:{after:80}});
+  const ch=[];
+  const meta=TIPO_META[d.tipo]||TIPO_META.caso_narrativo;
+  ch.push(new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:meta.label.toUpperCase(),bold:true,size:32,font:'Arial',color:'0D7A55'})],spacing:{after:140}}));
+  ch.push(new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:d.titulo||d.tema,bold:true,size:34,font:'Arial'})],spacing:{after:100}}));
+  ch.push(new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:d.asignatura,size:24,font:'Arial',color:'555555'})],spacing:{after:80}}));
+  ch.push(new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:[d.nivel,d.dificultad,d.duracion,d.modalidad].filter(Boolean).join(' · '),size:20,font:'Arial',color:'888888'})],spacing:{after:200}}));
+  const objs=safeArr(d.pedagogico,'objetivos_aprendizaje');
+  if(objs.length){ch.push(H1('1. Objetivos de Aprendizaje'));objs.forEach((o,i)=>ch.push(P(`[O${i+1}] ${o}`)));ch.push(BL());}
+  ch.push(H1('2. Enunciado y Contexto'));
+  ch.push(P(safeStr(d.contexto,'contexto_narrativo')));
+  safeArr(d.contexto,'datos_clave').forEach(dk=>ch.push(P(`• ${dk.etiqueta}: ${dk.valor||dk}`)));
+  const pc=safeStr(d.contexto,'pregunta_central');
+  if(pc){ch.push(BL());ch.push(new Paragraph({children:[new TextRun({text:'Pregunta central: '+pc,bold:true,size:22,font:'Arial',color:'D97706'})]}))}
+  ch.push(BL());
+  ch.push(H1('3. Preguntas'));
   safeArr(d.preguntas,'preguntas').forEach(p=>{
-    children.push(new Paragraph({ children:[new TextRun({ text:`Pregunta ${p.numero}: ${p.texto}`, bold:true, size:22, font:'Arial' })], spacing:{ after:60 } }));
-    if(p.nivel_bloom) children.push(new Paragraph({ children:[new TextRun({ text:`Nivel Bloom: ${p.nivel_bloom} · ${p.peso_sugerido||0}%`, size:20, font:'Arial', color:'888888', italics:true })], spacing:{ after:100 } }));
+    ch.push(new Paragraph({children:[new TextRun({text:`Pregunta ${p.numero}: ${p.texto}`,bold:true,size:22,font:'Arial'})],spacing:{after:50}}));
+    if(p.nivel_bloom)ch.push(new Paragraph({children:[new TextRun({text:`Bloom: ${p.nivel_bloom} · ${p.peso_sugerido||0}%`,size:20,font:'Arial',color:'888888',italics:true})],spacing:{after:90}}));
   });
-  children.push(Blank());
-
-  // 4. Solución
-  if (d.solucion?.contenido && d.solucion.contenido !== 'No solicitada'){
-    children.push(H1('4. Solución / Criterios de Evaluación'));
-    children.push(P(d.solucion.contenido));
-    const pts = safeArr(d.solucion,'puntos_clave');
-    if (pts.length){ children.push(H2('Puntos clave')); pts.forEach(pt=>children.push(P('• '+pt))); }
-    children.push(Blank());
+  ch.push(BL());
+  if(d.solucion?.contenido&&d.solucion.contenido!=='No solicitada'){
+    ch.push(H1('4. Solución / Criterios'));
+    ch.push(P(d.solucion.contenido));
+    safeArr(d.solucion,'puntos_clave').forEach(pt=>ch.push(P('• '+pt)));
+    ch.push(BL());
   }
-
-  // 5. Rúbrica — TABLE
-  const rubCrit = safeArr(d.rubrica,'criterios');
-  if (rubCrit.length){
-    children.push(H1('5. Rúbrica de Evaluación'));
-    const cw = [2000,800,1700,1700,1700,1126];
-    const rubTable = new Table({
-      width:{ size:9026, type:WidthType.DXA }, columnWidths:cw,
-      rows:[
-        new TableRow({ children:[
-          ...[ ['Criterio',cw[0]],['Peso',cw[1]],['Excelente',cw[2]],['Notable',cw[3]],['Aprobado',cw[4]],['Insuficiente',cw[5]] ].map(([t,w])=>
-            new TableCell({ borders, width:{size:w,type:WidthType.DXA}, shading:{fill:'0D7A55',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100},
-              children:[new Paragraph({children:[new TextRun({text:t,bold:true,color:'FFFFFF',size:18,font:'Arial'})]})] })
-          )
-        ]}),
-        ...rubCrit.map((c,i)=>new TableRow({ children:[
-          new TableCell({ borders, width:{size:cw[0],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({children:[new TextRun({text:c.criterio||'',bold:true,size:18,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:cw[1],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:(c.peso||0)+'%',bold:true,size:18,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:cw[2],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({children:[new TextRun({text:c.excelente||'',size:18,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:cw[3],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({children:[new TextRun({text:c.notable||'',size:18,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:cw[4],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({children:[new TextRun({text:c.aprobado||'',size:18,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:cw[5],type:WidthType.DXA}, shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR}, margins:{top:80,bottom:80,left:100,right:100}, children:[new Paragraph({children:[new TextRun({text:c.insuficiente||'',size:18,font:'Arial'})]})] }),
-        ]}))
-      ]
-    });
-    children.push(rubTable);
-    children.push(Blank());
+  const rubCrit=safeArr(d.rubrica,'criterios');
+  if(rubCrit.length){
+    ch.push(H1('5. Rúbrica de Evaluación'));
+    const cw=[2000,700,1656,1656,1656,1358];
+    ch.push(new Table({width:{size:9026,type:WidthType.DXA},columnWidths:cw,rows:[
+      new TableRow({children:[...['Criterio','Peso','Excelente','Notable','Aprobado','Insuficiente'].map((t,i)=>
+        new TableCell({borders:bds,width:{size:cw[i],type:WidthType.DXA},shading:{fill:'0D7A55',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:90,right:90},
+          children:[new Paragraph({children:[new TextRun({text:t,bold:true,color:'FFFFFF',size:18,font:'Arial'})]})]}))
+      ]}),
+      ...rubCrit.map((c,i)=>new TableRow({children:[
+        new TableCell({borders:bds,width:{size:cw[0],type:WidthType.DXA},shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:90,right:90},children:[new Paragraph({children:[new TextRun({text:c.criterio||'',bold:true,size:18,font:'Arial'})]})]}),
+        new TableCell({borders:bds,width:{size:cw[1],type:WidthType.DXA},shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:90,right:90},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:(c.peso||0)+'%',bold:true,size:18,font:'Arial'})]})]}),
+        ...[c.excelente,c.notable,c.aprobado,c.insuficiente].map((txt,j)=>
+          new TableCell({borders:bds,width:{size:cw[j+2],type:WidthType.DXA},shading:{fill:i%2?'F0FAF5':'FFFFFF',type:ShadingType.CLEAR},margins:{top:70,bottom:70,left:90,right:90},children:[new Paragraph({children:[new TextRun({text:txt||'',size:18,font:'Arial'})]})]}))
+      ]}))
+    ]}));
+    ch.push(BL());
   }
-
-  // 6. Variantes
-  const vars = safeArr(d.variantes,'variantes');
-  if (vars.length){
-    children.push(H1('6. Variantes Sugeridas'));
-    vars.forEach(v=>{
-      children.push(new Paragraph({ children:[new TextRun({ text:v.label+': '+v.titulo, bold:true, size:22, font:'Arial' })], spacing:{ after:40 } }));
-      children.push(P(v.descripcion));
-      if(v.cambios) children.push(P('→ ' + v.cambios));
-      children.push(Blank());
-    });
+  const vars=safeArr(d.variantes,'variantes');
+  if(vars.length){
+    ch.push(H1('6. Variantes Sugeridas'));
+    vars.forEach(v=>{ch.push(new Paragraph({children:[new TextRun({text:v.label+': '+v.titulo,bold:true,size:22,font:'Arial'})],spacing:{after:40}}));ch.push(P(v.descripcion));if(v.cambios)ch.push(P('→ '+v.cambios));ch.push(BL());});
   }
-
-  // Footer
-  children.push(new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({ text:`Generado con CasoPrácticoAI · ${new Date().toLocaleDateString('es-ES')}`, size:18, font:'Arial', color:'AAAAAA', italics:true })] }));
-
-  const docObj = new Document({
-    styles:{ default:{ document:{ run:{ font:'Arial', size:22 } } } },
-    sections:[{ properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1134,right:1134,bottom:1134,left:1134} } }, children }]
-  });
-
-  const buffer = await Packer.toBlob(docObj);
-  const url = URL.createObjectURL(buffer);
-  const a = document.createElement('a');
-  a.href = url; a.download = `CasoPractico_${(d.titulo||d.tema).replace(/\s+/g,'_').substring(0,40)}.docx`;
-  a.click();
+  ch.push(new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:`Generado con CasoPrácticoAI · ${new Date().toLocaleDateString('es-ES')}`,size:18,font:'Arial',color:'AAAAAA',italics:true})]}));
+  const docObj=new Document({styles:{default:{document:{run:{font:'Arial',size:22}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}},children:ch}]});
+  const buf=await Packer.toBlob(docObj);
+  const url=URL.createObjectURL(buf);
+  const a=document.createElement('a');a.href=url;a.download=`CasoPractico_${(d.titulo||d.tema).replace(/\s+/g,'_').substring(0,40)}.docx`;a.click();
   showToast('✅ Word descargado');
 }
 
-// ─────────────────────────────────────────────
-// COPY
-// ─────────────────────────────────────────────
-function copyCaso(){
-  const el = document.getElementById('casoBody');
-  navigator.clipboard.writeText(el ? el.innerText : '').then(()=>showToast('✅ Copiado al portapapeles'));
-}
+function copyCaso(){ const el=document.getElementById('casoBody'); navigator.clipboard.writeText(el?el.innerText:'').then(()=>showToast('✅ Copiado')); }
 
 // ─────────────────────────────────────────────
 // UTILS
 // ─────────────────────────────────────────────
-function safeArr(obj, key){
-  if (!obj) return [];
-  if (typeof obj === 'string'){ try{ obj=JSON.parse(obj); }catch{ return []; } }
-  const v = obj[key];
-  return Array.isArray(v) ? v : [];
-}
-function safeStr(obj, key, fallback=''){
-  if (!obj) return fallback;
-  if (typeof obj === 'string'){ try{ obj=JSON.parse(obj); }catch{ return fallback; } }
-  return String(obj[key]||fallback);
-}
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3200);
-}
+function safeArr(obj,key){ if(!obj)return[]; if(typeof obj==='string'){try{obj=JSON.parse(obj);}catch{return[];}} const v=obj[key]; return Array.isArray(v)?v:[]; }
+function safeStr(obj,key,fb=''){ if(!obj)return fb; if(typeof obj==='string'){try{obj=JSON.parse(obj);}catch{return fb;}} return String(obj[key]||fb); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200); }
 </script>
-
-<style>
-@media print {
-  .topbar,.sidebar,.topbar-right,.export-btns,.caso-header .btn-export,.history-panel,.overlay,.toast,.modal-wrap{ display:none!important }
-  .layout{ display:block }
-  .main{ padding:0 }
-  .caso-body{ box-shadow:none;border:none }
-  .rubrica-table{ font-size:10px }
-}
-</style>
 </body>
 </html>
