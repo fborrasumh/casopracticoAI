@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 message: "Si usas este software, cítalo con estos metadatos."
 title: "CasoPrácticoAI"
+abstract: "Genera casos prácticos universitarios de ocho tipos (caso narrativo, problema cuantitativo, supuesto, caso Harvard, role-play, proyecto, análisis crítico y debate) con objetivos, preguntas por niveles de Bloom, solución modelo verificada, rúbrica y variantes, en versión para el estudiante y para el docente."
 type: software
 authors:
   - family-names: "Borrás Rocher"
@@ -8,8 +9,15 @@ authors:
     affiliation: "Universidad Miguel Hernández de Elche"
     orcid: "https://orcid.org/0000-0002-5519-4573"
 doi: "10.5281/zenodo.21423193"
-version: "1.0.0"
-date-released: "2026-07-18"
+version: "2.0.0"
+date-released: "2026-09-30"
 url: "https://fborrasumh.github.io/casopracticoAI/"
 repository-code: "https://github.com/fborrasumh/casopracticoAI"
 license: MIT
+keywords:
+  - "casos prácticos"
+  - "aprendizaje basado en casos"
+  - "rúbricas"
+  - "taxonomía de Bloom"
+  - "docencia universitaria"
+  - "inteligencia artificial"
